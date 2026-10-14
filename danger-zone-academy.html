@@ -32,7 +32,7 @@ body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:1
 h1,h2,h3{font-family:var(--f-display);font-stretch:75%;line-height:1.05;text-wrap:balance;margin:0}
 .mono{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
 .eyebrow{font-family:var(--f-mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
-button{font:inherit;color:inherit;cursor:pointer}
+button{font:inherit;color:inherit;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
 button:focus-visible,[tabindex]:focus-visible{outline:3px solid var(--cold);outline-offset:2px}
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:1.5px solid var(--ink);background:var(--ink);color:var(--bg);border-radius:8px;padding:10px 16px;font-weight:700;min-height:44px}
 .btn.ghost{background:transparent;color:var(--ink);border-color:var(--line)}
