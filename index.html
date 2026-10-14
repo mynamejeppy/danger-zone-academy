@@ -1,0 +1,1274 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Danger Zone Academy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,500..900&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+/* Layout: a kitchen line. Header carries a probe-thermometer XP gauge; stations are order tickets in a wrapping grid; a check takes over the screen like a ticket on the pass. */
+:root{
+  --bg:#e9eeed; --surface:#ffffff; --surface-2:#dce4e2; --ink:#13201c; --muted:#53635d; --line:#c3cfcb;
+  --accent:#0a7556; --accent-ink:#ffffff; --accent-soft:#d2eadf;
+  --hot:#c33d28; --hot-soft:#f7dcd6; --cold:#1f5fc2; --cold-soft:#d9e5f8; --gold:#b07d00; --gold-soft:#f6e9c4;
+  --shadow:0 1px 0 rgba(19,32,28,.05),0 8px 20px -14px rgba(19,32,28,.35);
+  --f-display:"Archivo","Arial Narrow",system-ui,sans-serif;
+  --f-body:"Atkinson Hyperlegible",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,Consolas,monospace;
+  --r:10px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0e1513; --surface:#16201e; --surface-2:#1e2b28; --ink:#e4eeea; --muted:#93a59f; --line:#2b3a36;
+  --accent:#36c28f; --accent-ink:#06231a; --accent-soft:#163a2e;
+  --hot:#ff6e57; --hot-soft:#3d1d17; --cold:#73a6ff; --cold-soft:#17284a; --gold:#e8b53c; --gold-soft:#3a2f12;
+  --shadow:0 1px 0 rgba(0,0,0,.3),0 10px 24px -14px rgba(0,0,0,.7); color-scheme:dark;
+}}
+:root[data-theme="dark"]{
+  --bg:#0e1513; --surface:#16201e; --surface-2:#1e2b28; --ink:#e4eeea; --muted:#93a59f; --line:#2b3a36;
+  --accent:#36c28f; --accent-ink:#06231a; --accent-soft:#163a2e;
+  --hot:#ff6e57; --hot-soft:#3d1d17; --cold:#73a6ff; --cold-soft:#17284a; --gold:#e8b53c; --gold-soft:#3a2f12;
+  --shadow:0 1px 0 rgba(0,0,0,.3),0 10px 24px -14px rgba(0,0,0,.7); color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.5}
+.wrap{max-width:1040px;margin:0 auto;padding-inline:16px;padding-block:20px 40px}
+h1,h2,h3{font-family:var(--f-display);font-stretch:75%;line-height:1.05;text-wrap:balance;margin:0}
+.mono{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.eyebrow{font-family:var(--f-mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,[tabindex]:focus-visible{outline:3px solid var(--cold);outline-offset:2px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:1.5px solid var(--ink);background:var(--ink);color:var(--bg);border-radius:8px;padding:10px 16px;font-weight:700;min-height:44px}
+.btn.ghost{background:transparent;color:var(--ink);border-color:var(--line)}
+.btn.go{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.link{background:none;border:0;padding:6px 0;color:var(--muted);font-weight:700}
+.link:hover{color:var(--ink)}
+
+/* Header */
+header.top{display:grid;grid-template-columns:1fr auto;gap:16px 24px;align-items:end;padding-bottom:18px;border-bottom:2px solid var(--ink)}
+.brand h1{font-size:clamp(34px,6vw,56px);font-weight:900;letter-spacing:-.01em}
+.brand h1 .zone{color:var(--hot)}
+.brand p{margin:6px 0 0;color:var(--muted);max-width:52ch}
+.seg{display:inline-flex;border:1.5px solid var(--ink);border-radius:9px;overflow:hidden}
+.seg button{border:0;background:transparent;padding:9px 14px;font-weight:700;min-height:44px;text-align:left;line-height:1.15}
+.seg button small{display:block;font-family:var(--f-mono);font-size:11px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;opacity:.75}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+.trackpick{display:flex;flex-direction:column;gap:6px;align-items:flex-end}
+
+.gauge{display:grid;grid-template-columns:auto 1fr auto;gap:12px 16px;align-items:center;margin-top:18px}
+.probe{position:relative;height:22px;display:flex;align-items:center;min-width:0}
+.probe .bulb{width:22px;height:22px;border-radius:50%;background:var(--accent);flex:none;position:relative;z-index:1}
+.probe .stem{flex:1;height:10px;margin-left:-4px;border-radius:0 6px 6px 0;background:var(--surface-2);border:1px solid var(--line);overflow:hidden}
+.probe .fill{height:100%;background:var(--accent);width:0;transition:width .6s ease}
+.rank{font-family:var(--f-display);font-stretch:80%;font-weight:800;font-size:20px;white-space:nowrap}
+.gstats{display:flex;gap:18px;flex-wrap:wrap;justify-content:flex-end}
+.gstat{display:flex;flex-direction:column;align-items:flex-end}
+.gstat b{font-family:var(--f-mono);font-size:18px;font-variant-numeric:tabular-nums}
+.gstat span{font-size:12px;color:var(--muted)}
+.gnote{grid-column:1/-1;font-size:13px;color:var(--muted);margin-top:-6px}
+
+/* Tabs */
+nav.tabs{display:flex;gap:4px;margin:22px 0 18px;border-bottom:1px solid var(--line);overflow-x:auto}
+nav.tabs button{border:0;background:none;padding:10px 14px;font-weight:700;color:var(--muted);border-bottom:3px solid transparent;margin-bottom:-1px;white-space:nowrap;min-height:44px}
+nav.tabs button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--hot)}
+nav.tabs .count{font-family:var(--f-mono);font-size:12px;background:var(--surface-2);border-radius:20px;padding:1px 7px;margin-left:4px}
+
+/* Tickets */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,290px),1fr));gap:14px}
+.ticket{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);padding:14px 16px 16px;display:flex;flex-direction:column;gap:10px;min-width:0;position:relative}
+.ticket .thead{display:flex;justify-content:space-between;align-items:center;gap:8px;padding-bottom:8px;border-bottom:2px dashed var(--line)}
+.ticket h3{font-size:26px;font-weight:800}
+.ticket .area{color:var(--muted);font-size:14px;margin-top:-4px}
+.ticket p{margin:0;font-size:15px}
+.ticket .tfoot{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:auto;padding-top:4px}
+.ticket.locked{background:var(--surface-2);box-shadow:none}
+.ticket.locked h3,.ticket.locked p{opacity:.6}
+.ticket.boss{border:2px solid var(--hot)}
+.ticket.boss h3{color:var(--hot)}
+.pill{font-family:var(--f-mono);font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;border-radius:20px;padding:3px 9px;white-space:nowrap}
+.pill.ok{background:var(--accent-soft);color:var(--accent)}
+.pill.ready{background:var(--cold-soft);color:var(--cold)}
+.pill.lock{background:var(--surface);color:var(--muted);border:1px solid var(--line)}
+.pill.hot{background:var(--hot-soft);color:var(--hot)}
+.stars{display:inline-flex;gap:2px}
+.stars svg{width:18px;height:18px}
+.stars .on{fill:var(--gold)} .stars .off{fill:var(--surface-2);stroke:var(--line)}
+.best{font-family:var(--f-mono);font-size:13px;color:var(--muted);margin-left:auto}
+
+/* Badges */
+.badges{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,230px),1fr));gap:12px}
+.badge{display:flex;gap:12px;align-items:center;padding:12px;border-radius:var(--r);border:1px solid var(--line);background:var(--surface);min-width:0}
+.badge .medal{width:46px;height:46px;border-radius:50%;flex:none;display:grid;place-items:center;font-family:var(--f-mono);font-weight:700;font-size:14px;background:var(--surface-2);color:var(--muted);border:2px dashed var(--line)}
+.badge.got .medal{background:var(--gold-soft);color:var(--gold);border:2px solid var(--gold)}
+.badge b{display:block}
+.badge span{font-size:13px;color:var(--muted)}
+.badge:not(.got){opacity:.75}
+
+/* Play */
+.play{max-width:760px;margin:0 auto}
+.play-head{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+.play-head .ttl{font-family:var(--f-mono);font-size:13px;color:var(--muted);letter-spacing:.04em;text-transform:uppercase}
+.timer{margin-left:auto;font-family:var(--f-mono);font-weight:700;font-size:18px;padding:4px 10px;border-radius:6px;background:var(--surface-2)}
+.timer.low{background:var(--hot-soft);color:var(--hot)}
+.bar{height:8px;background:var(--surface-2);border-radius:6px;overflow:hidden;margin-bottom:16px}
+.bar span{display:block;height:100%;background:var(--ink);transition:width .3s}
+.qmeta{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;gap:8px}
+.combo{font-family:var(--f-mono);font-weight:700;font-size:13px;color:var(--hot);background:var(--hot-soft);border-radius:20px;padding:3px 10px}
+.qtext{font-family:var(--f-body);font-stretch:100%;font-size:clamp(20px,3.4vw,25px);font-weight:700;line-height:1.3;margin-bottom:18px}
+.opts{display:grid;gap:10px}
+.opt{display:flex;gap:12px;align-items:flex-start;text-align:left;background:var(--surface);border:1.5px solid var(--line);border-radius:var(--r);padding:13px 14px;min-height:52px;font-size:17px;transition:border-color .15s,background .15s}
+.opt:hover:not(:disabled){border-color:var(--ink)}
+.opt .key{font-family:var(--f-mono);font-weight:700;font-size:13px;width:26px;height:26px;border-radius:6px;display:grid;place-items:center;background:var(--surface-2);flex:none;margin-top:1px}
+.opt.right{border-color:var(--accent);background:var(--accent-soft)}
+.opt.right .key{background:var(--accent);color:var(--accent-ink)}
+.opt.wrong{border-color:var(--hot);background:var(--hot-soft)}
+.opt.wrong .key{background:var(--hot);color:#fff}
+.opt:disabled{cursor:default}
+.feedback{margin-top:16px;padding:14px 16px;border-radius:var(--r);background:var(--surface);border:1px solid var(--line);display:flex;flex-direction:column;gap:12px}
+.feedback .verdict{font-family:var(--f-display);font-stretch:80%;font-weight:800;font-size:22px}
+.feedback .verdict.ok{color:var(--accent)} .feedback .verdict.no{color:var(--hot)}
+.feedback p{margin:0}
+.feedback .row{display:flex;justify-content:flex-end}
+
+/* Study cards */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);padding:22px 22px 24px;min-height:260px}
+.card h2{font-size:clamp(28px,5vw,38px);font-weight:800;margin-bottom:12px}
+.card ul{margin:0;padding-left:20px;display:grid;gap:6px}
+.card p{margin:0 0 10px;max-width:62ch}
+.card .temp{font-family:var(--f-mono);font-weight:700;color:var(--hot);white-space:nowrap}
+.card .cold{font-family:var(--f-mono);font-weight:700;color:var(--cold);white-space:nowrap}
+.card .mgrtag{margin-bottom:10px;display:inline-block}
+.dots{display:flex;gap:6px;justify-content:center;margin:14px 0;flex-wrap:wrap}
+.dots i{width:8px;height:8px;border-radius:50%;background:var(--line)}
+.dots i.on{background:var(--ink)}
+.navrow{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+
+/* Results */
+.result{text-align:center;padding:10px 0 4px}
+.stamp{display:inline-block;font-family:var(--f-display);font-stretch:70%;font-weight:900;font-size:clamp(30px,7vw,46px);letter-spacing:.04em;text-transform:uppercase;padding:6px 18px;border:4px solid currentColor;border-radius:8px;transform:rotate(-3deg);margin:8px 0 14px}
+.stamp.ok{color:var(--accent)} .stamp.no{color:var(--hot)}
+@media (prefers-reduced-motion:no-preference){.stamp{animation:stampin .35s cubic-bezier(.2,1.6,.4,1) both}@keyframes stampin{from{transform:rotate(-3deg) scale(1.6);opacity:0}}}
+.bigscore{font-family:var(--f-mono);font-size:56px;font-weight:700;line-height:1}
+.rstats{display:flex;justify-content:center;gap:24px;flex-wrap:wrap;margin:16px 0 20px;color:var(--muted)}
+.rstats b{display:block;font-family:var(--f-mono);color:var(--ink);font-size:20px}
+.btnrow{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.misslist{margin-top:28px;text-align:left;display:grid;gap:10px}
+.miss{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:12px 14px}
+.miss .q{font-weight:700;margin-bottom:6px}
+.miss .yours{color:var(--hot)} .miss .ans{color:var(--accent);font-weight:700}
+.miss p{margin:4px 0 0;font-size:15px;color:var(--muted)}
+
+/* Side quests */
+.quest h3{font-size:26px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:1.5px solid var(--line);background:var(--surface);border-radius:22px;padding:8px 14px;font-weight:700;min-height:44px}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.chip.right{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+.chip.missed{border-color:var(--accent);border-style:dashed;color:var(--accent)}
+.chip.wrong{background:var(--hot-soft);border-color:var(--hot);color:var(--hot)}
+.dish{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px;margin-bottom:14px}
+.dish h2{font-size:32px;margin-bottom:6px}
+.dish .ing{color:var(--muted)}
+.temps{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.tbtn{font-family:var(--f-mono);font-size:28px;font-weight:700;padding:18px 10px;border-radius:var(--r);border:1.5px solid var(--line);background:var(--surface)}
+.tbtn:hover{border-color:var(--ink)}
+.tbtn.right{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+.tbtn.wrong{background:var(--hot-soft);border-color:var(--hot);color:var(--hot)}
+.rushprompt{font-family:var(--f-display);font-stretch:80%;font-weight:800;font-size:clamp(26px,5vw,36px);text-align:center;margin:18px 0 22px;min-height:2.2em;display:flex;align-items:center;justify-content:center}
+.rushscore{font-family:var(--f-mono);font-weight:700;font-size:18px}
+.cooler{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:16px}
+.shelves{background:var(--surface-2);border:2px solid var(--ink);border-radius:var(--r);padding:10px;display:grid;gap:8px}
+.shelf{display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:center;background:var(--surface);border-radius:6px;padding:10px 12px;min-height:52px;border-bottom:4px solid var(--line)}
+.shelf .n{font-family:var(--f-mono);font-size:12px;color:var(--muted);width:52px}
+.shelf.right{border-bottom-color:var(--accent)} .shelf.wrong{border-bottom-color:var(--hot)}
+.shelf small{display:block;color:var(--muted);font-size:13px}
+.items{display:grid;gap:8px;align-content:start}
+.item{text-align:left;background:var(--surface);border:1.5px solid var(--line);border-radius:8px;padding:11px 12px;font-weight:700;min-height:48px}
+.item:hover:not(:disabled){border-color:var(--ink)}
+.item:disabled{opacity:.3}
+.note{font-size:14px;color:var(--muted)}
+.flash{text-align:center;font-weight:700;min-height:1.6em;margin-top:12px}
+.flash.ok{color:var(--accent)} .flash.no{color:var(--hot)}
+
+/* Study pictures */
+.tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.tags .mgrtag{margin:0}
+.fig{margin:4px 0 14px}
+.fig svg{width:100%;height:auto;max-width:520px;display:block;margin:0 auto}
+.fig text{font-family:var(--f-mono);font-size:13px}
+.f-dz{fill:var(--hot-soft)} .s-dz{fill:var(--hot);font-weight:700;letter-spacing:.08em;font-size:12px}
+.f-tube{fill:var(--surface-2);stroke:var(--line)} .f-merc{fill:var(--hot)}
+.s-tick{stroke:var(--ink);stroke-width:1.5} .s-temp{fill:var(--ink);font-weight:700}
+.fig text.s-lbl{fill:var(--muted);font-family:var(--f-body)}
+.s-grid{stroke:var(--line);stroke-dasharray:4 4} .s-axis{fill:var(--muted)}
+.s-line{fill:none;stroke:var(--ink);stroke-width:3} .f-dot{fill:var(--ink)}
+.f-st1{fill:var(--hot-soft)} .f-st2{fill:var(--cold-soft)} .s-st1{fill:var(--hot);font-weight:700} .s-st2{fill:var(--cold);font-weight:700}
+.f-board{fill:var(--surface-2);stroke:var(--line)} .f-basin{fill:var(--surface);stroke:var(--ink);stroke-width:2} .f-water{fill:var(--cold-soft)}
+.fig text.s-step{fill:var(--ink);font-weight:700;font-size:12px} .fig text.s-sub{fill:var(--muted);font-size:11px}
+
+/* Study drills */
+.drillprompt{color:var(--muted);margin:-4px 0 14px}
+.slots{list-style:none;margin:0 0 14px;padding:0;display:grid;gap:6px}
+.slot{display:grid;grid-template-columns:28px 1fr;gap:10px;align-items:center;background:var(--surface-2);border-radius:8px;padding:10px 12px;min-height:46px}
+.slot .n{font-family:var(--f-mono);font-weight:700;color:var(--muted)}
+.slot.right{background:var(--accent-soft)} .slot.wrong{background:var(--hot-soft)}
+.slot small{display:block;color:var(--muted);font-size:13px}
+.pool{display:grid;gap:8px;grid-template-columns:repeat(auto-fill,minmax(min(100%,220px),1fr))}
+.drillbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:14px}
+.msg{font-weight:700} .msg.ok{color:var(--accent)} .msg.no{color:var(--hot)}
+.match{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px 12px}
+.match .col{display:grid;gap:8px;align-content:start}
+.mbtn{text-align:left;background:var(--surface);border:1.5px solid var(--line);border-radius:8px;padding:10px 12px;font-weight:700;min-height:48px;transition:background .15s,border-color .15s}
+.mbtn:hover:not(:disabled){border-color:var(--ink)}
+.mbtn.sel{border-color:var(--cold);background:var(--cold-soft)}
+.mbtn.done{border-color:var(--accent);background:var(--accent-soft);color:var(--accent);cursor:default}
+.mbtn.bad{border-color:var(--hot);background:var(--hot-soft)}
+.sortitem{font-family:var(--f-display);font-stretch:85%;font-weight:800;font-size:clamp(22px,4vw,28px);line-height:1.15;text-align:center;padding:22px 14px;border:2px dashed var(--line);border-radius:var(--r);margin-bottom:12px;text-wrap:balance}
+.bins{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,140px),1fr));gap:8px}
+.btn.bin:disabled{opacity:.5}
+.btn.bin.right{background:var(--accent-soft);border-color:var(--accent);color:var(--accent);opacity:1}
+.btn.bin.wrong{background:var(--hot-soft);border-color:var(--hot);color:var(--hot);opacity:1}
+
+footer{margin-top:40px;padding-top:16px;border-top:1px solid var(--line);font-size:13px;color:var(--muted);display:grid;gap:8px}
+footer a{color:inherit}
+footer .rowf{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:center}
+.sync::before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--muted);margin-right:6px}
+.sync.on::before{background:var(--accent)}
+#toasts{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(16px + env(safe-area-inset-bottom,0px));display:grid;gap:8px;z-index:20;width:min(92vw,380px)}
+.toast{background:var(--ink);color:var(--bg);border-radius:10px;padding:12px 16px;font-weight:700;box-shadow:var(--shadow);display:flex;gap:10px;align-items:center}
+.toast .tag{font-family:var(--f-mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--gold)}
+@media (prefers-reduced-motion:no-preference){.toast{animation:up .25s ease both}@keyframes up{from{transform:translateY(12px);opacity:0}}}
+.empty{background:var(--surface);border:1px dashed var(--line);border-radius:var(--r);padding:18px;color:var(--muted)}
+.section-h{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin:28px 0 12px;flex-wrap:wrap}
+.section-h h2{font-size:28px;font-weight:800}
+
+@media (max-width:640px){
+  header.top{grid-template-columns:1fr}
+  .trackpick{align-items:stretch}
+  .seg{display:grid;grid-template-columns:1fr 1fr}
+  .gauge{grid-template-columns:1fr}
+  .gstats{justify-content:space-between}
+  .gstat{align-items:flex-start}
+  .cooler{grid-template-columns:1fr}
+  .tbtn{font-size:24px;padding:14px 8px}
+}
+</style>
+
+</head>
+<body>
+<div class="wrap">
+  <div id="home">
+    <header class="top">
+      <div class="brand">
+        <div class="eyebrow">Food safety training · 41°F to 135°F</div>
+        <h1>Danger <span class="zone">Zone</span> Academy</h1>
+        <p>Work through each kitchen station, pass its check, and unlock the final inspection.</p>
+      </div>
+      <div class="trackpick">
+        <span class="eyebrow">Difficulty</span>
+        <div class="seg" role="group" aria-label="Choose track">
+          <button id="t-fh" data-track="fh"><small>Easy</small>Food Handler</button>
+          <button id="t-mgr" data-track="mgr"><small>Hard</small>Manager</button>
+        </div>
+      </div>
+    </header>
+    <div class="gauge">
+      <div class="rank" id="rank">Dish Pit Rookie</div>
+      <div class="probe" aria-hidden="true"><span class="bulb"></span><span class="stem"><span class="fill" id="xpfill"></span></span></div>
+      <div class="gstats">
+        <div class="gstat"><b id="s-xp">0</b><span>XP</span></div>
+        <div class="gstat"><b id="s-stars">0</b><span>stars</span></div>
+        <div class="gstat"><b id="s-streak">0</b><span>day streak</span></div>
+      </div>
+      <div class="gnote" id="xpnote"></div>
+    </div>
+
+    <nav class="tabs" role="tablist">
+      <button role="tab" id="tab-stations" data-tab="stations" aria-selected="true">Stations</button>
+      <button role="tab" id="tab-quests" data-tab="quests" aria-selected="false">Side quests</button>
+      <button role="tab" id="tab-badges" data-tab="badges" aria-selected="false">Badges <span class="count" id="badgecount">0</span></button>
+    </nav>
+
+    <section id="pane-stations"></section>
+    <section id="pane-quests" hidden></section>
+    <section id="pane-badges" hidden></section>
+  </div>
+
+  <section id="play" class="play" hidden></section>
+
+  <footer>
+    <div class="rowf">
+      <span class="sync" id="sync">Saved on this device</span>
+      <button class="link" id="reset">Reset all progress</button>
+    </div>
+    <div>Independent study aid. Not affiliated with or endorsed by ServSafe or the National Restaurant Association. Content follows the <a href="https://www.fda.gov/food/fda-food-code/food-code-2022" target="_blank" rel="noopener">FDA Food Code</a>; your state or local health department may have different rules. Book the real exam at <a href="https://www.servsafe.com" target="_blank" rel="noopener">servsafe.com</a>.</div>
+  </footer>
+</div>
+<div id="toasts" aria-live="polite"></div>
+
+<script>
+/* ---------- Content ---------- */
+const TRACKS = {
+  fh:  {key:"fh",  name:"Food Handler", pass:75, qPer:8,  finalN:30, xp:10, timer:0},
+  mgr: {key:"mgr", name:"Manager",      pass:80, qPer:10, finalN:50, xp:15, timer:60*60}
+};
+const RANKS = [[0,"Dish Pit Rookie"],[150,"Prep Cook"],[400,"Line Cook"],[800,"Sous Chef"],[1300,"Chef de Cuisine"],[2000,"Executive Chef"]];
+
+// Questions: [question, [correct, wrong, wrong, wrong], explanation, tier]  tier f = both tracks, m = manager only
+const CH = [
+{ id:"micro", name:"Microbe Mayhem", area:"Contamination & foodborne illness",
+  blurb:"The three kinds of contaminants, FAT TOM, the Big 6 pathogens and which foods need time and temperature control.",
+  cards:[
+  ["Three kinds of contamination","<ul><li><b>Biological:</b> bacteria, viruses, parasites, fungi and the toxins they make.</li><li><b>Chemical:</b> cleaners, sanitizers, polishes, pesticides.</li><li><b>Physical:</b> metal shavings, glass, bone, staples, jewelry, bandages.</li></ul>"],
+  ["FAT TOM","<p>What bacteria need to grow:</p><ul><li><b>F</b>ood (especially protein)</li><li><b>A</b>cidity: pH 4.6 to 7.5 (neutral to slightly acidic)</li><li><b>T</b>emperature: the danger zone, <span class='temp'>41°F–135°F</span></li><li><b>T</b>ime: 4 or more hours in the danger zone means throw it out</li><li><b>O</b>xygen (some need it, some don't)</li><li><b>M</b>oisture: water activity 0.85 or higher</li></ul><p>Time and temperature are the two you control directly.</p>"],
+  ["The Big 6","<p>Highly contagious, severe even in small amounts:</p><ul><li>Norovirus</li><li>Hepatitis A</li><li>Shigella spp.</li><li>Salmonella Typhi</li><li>Nontyphoidal Salmonella</li><li>Shiga toxin-producing E. coli (STEC)</li></ul>"],
+  ["Viruses vs. bacteria","<p>Viruses (Norovirus, Hepatitis A) don't grow in food and normal cooking won't reliably kill them. They spread from people, so <b>handwashing and keeping sick staff home</b> are the main defenses.</p><p>Bacteria grow in food in the danger zone. Control time and temperature.</p>"],
+  ["TCS food","<p>Food that needs time and temperature control:</p><ul><li>Milk and dairy; shell eggs; meat; poultry; fish; shellfish</li><li>Baked potatoes; cooked rice, beans and vegetables</li><li>Tofu and soy protein; sprouts</li><li>Sliced melons, cut tomatoes, cut leafy greens</li><li>Untreated garlic-in-oil</li></ul>"],
+  ["High-risk populations","<ul><li>Elderly people</li><li>Preschool-age children</li><li>People with weakened immune systems (cancer treatment, transplants, HIV)</li></ul><p>They get sicker, faster. Many rules are stricter when you serve them.</p>"],
+  ["Pathogens by food","<ul><li><b>Bacillus cereus:</b> cooked rice held at the wrong temperature</li><li><b>Clostridium perfringens:</b> meat, stews and gravy cooled too slowly</li><li><b>Clostridium botulinum:</b> garlic-in-oil, bad canning, reduced-oxygen packaging</li><li><b>Listeria:</b> deli meats, unpasteurized dairy; grows in the cooler</li><li><b>Vibrio:</b> raw oysters from warm water</li></ul>","m"],
+  ["Seafood toxins","<p>Cooking and freezing <b>do not</b> destroy them. Buy from approved suppliers.</p><ul><li><b>Histamine (scombroid):</b> tuna, mackerel, mahi-mahi that were time-temperature abused. Flushing, sweating, burning mouth.</li><li><b>Ciguatoxin:</b> reef fish like barracuda, grouper, snapper, amberjack. Hot and cold sensations reversed.</li></ul>","m"]
+  ],
+  qs:[
+  ["What is the temperature danger zone?",["41°F to 135°F","0°F to 32°F","135°F to 165°F","32°F to 70°F"],"Bacteria grow quickly between 41°F and 135°F. Keep cold food cold and hot food hot.","f"],
+  ["Bacteria grow best in food that is:",["Neutral to slightly acidic","Highly acidic, like lemon juice","Very dry, like crackers","Frozen solid"],"Most pathogens grow best at pH 4.6 to 7.5.","f"],
+  ["Which is a physical contaminant?",["Metal shavings from a can opener","Sanitizer on a prep table","Norovirus","Histamine in tuna"],"Physical contaminants are objects: metal, glass, bone, jewelry, bandages.","f"],
+  ["Which pathogen is one of the Big 6?",["Hepatitis A","Bacillus cereus","Clostridium perfringens","Listeria monocytogenes"],"The Big 6 are Norovirus, Hepatitis A, Shigella, Salmonella Typhi, nontyphoidal Salmonella and STEC E. coli.","f"],
+  ["Which food needs time and temperature control (TCS)?",["Sliced melon","A whole, uncut apple","Uncooked dry rice","A loaf of bread"],"Cutting a melon exposes moist flesh where bacteria can grow. Sliced melon, cut tomatoes and cut leafy greens are TCS.","f"],
+  ["What is the best way to stop Norovirus from spreading in a kitchen?",["Wash hands correctly and keep sick staff away","Cook all food to 135°F","Store food in the freezer","Keep food covered"],"Norovirus comes from people and isn't reliably killed by cooking. Handwashing and excluding sick staff are the key controls.","f"],
+  ["A cook sprays glass cleaner next to an open salad bar. What kind of contamination is this?",["Chemical","Physical","Biological","Cross-contact"],"Cleaners, sanitizers and polishes are chemical contaminants. Use them away from food.","f"],
+  ["Which group is a high-risk population?",["Preschool-age children","Teenagers","Healthy adults aged 18 to 40","College athletes"],"Preschool-age children, the elderly and people with weakened immune systems are at higher risk.","f"],
+  ["Of the six FAT TOM conditions, which two can a food handler control most directly?",["Time and temperature","Oxygen and moisture","Food and acidity","Acidity and oxygen"],"Limit time in the danger zone and keep food at safe temperatures.","f"],
+  ["Tuna that was left out too long makes guests flush and sweat. Will cooking it have prevented this?",["No. Histamine is not destroyed by cooking or freezing","Yes, if cooked to 145°F","Yes, if cooked to 165°F","Yes, if frozen first"],"Histamine (scombroid) toxin survives cooking and freezing. Prevent it by buying from approved suppliers and controlling temperature.","m"],
+  ["Bacteria grow fastest in which range?",["70°F to 125°F","0°F to 32°F","135°F to 165°F","165°F to 212°F"],"Growth is fastest in the middle of the danger zone, 70°F to 125°F.","m"],
+  ["A guest ate barracuda and reports that cold things feel hot and hot things feel cold. What is the likely cause?",["Ciguatoxin","Histamine","Hepatitis A","Bacillus cereus"],"Ciguatoxin comes from reef fish such as barracuda, grouper and snapper. Reversed hot and cold sensation is a classic sign.","m"],
+  ["Bacillus cereus is most commonly linked to:",["Cooked rice held at the wrong temperature","Raw oysters","Deli meat","Ground beef"],"B. cereus spores survive cooking. Cooked rice left in the danger zone lets them grow and make toxin.","m"],
+  ["Clostridium perfringens outbreaks are usually caused by:",["Meat, stews and gravy that were cooled too slowly","Unwashed lettuce","Raw shellfish","Bartenders not washing hands"],"Large batches of meat dishes that cool slowly are the classic source. Follow the two-stage cooling rule.","m"],
+  ["Bacteria grow well in food with a water activity of:",["0.85 or higher","0.20 or lower","0.50 or lower","Exactly 0"],"Moist foods (water activity 0.85+) support bacterial growth.","m"],
+  ["Which pathogen can grow at refrigerator temperatures and is linked to deli meat and unpasteurized cheese?",["Listeria monocytogenes","Norovirus","Hepatitis A","Ciguatoxin"],"Listeria keeps growing in the cooler. Watch date marks on ready-to-eat food.","m"],
+  ["Garlic-in-oil kept at room temperature is a risk for:",["Clostridium botulinum","Vibrio vulnificus","Shigella","Norovirus"],"Oil cuts off oxygen, and C. botulinum grows without oxygen. Keep garlic-in-oil cold or use a treated product.","m"]
+  ]},
+{ id:"hands", name:"Clean Hands Crew", area:"Personal hygiene & illness",
+  blurb:"Handwashing, gloves, cuts, jewelry and when sick staff stay home.",
+  cards:[
+  ["How to wash hands","<ul><li>Wet hands and arms with running water at least <span class='temp'>100°F</span></li><li>Apply soap</li><li>Scrub hands and arms for <b>10 to 15 seconds</b>, between fingers and under nails</li><li>Rinse</li><li>Dry with a single-use paper towel or hand dryer</li></ul><p>The whole process takes at least <b>20 seconds</b>. Use the towel to turn off the faucet.</p>"],
+  ["When to wash","<ul><li>Before starting work and before putting on gloves</li><li>After the restroom</li><li>After touching raw meat, poultry or seafood, before touching ready-to-eat food</li><li>After touching your hair, face or body</li><li>After sneezing, coughing, eating, drinking, smoking or chewing gum</li><li>After handling chemicals, garbage, dirty dishes or money</li></ul>"],
+  ["Hand antiseptics","<p>Use them <b>after</b> handwashing, never <b>instead</b> of it.</p>"],
+  ["Gloves","<ul><li>No bare-hand contact with ready-to-eat food. Use gloves, tongs or deli tissue.</li><li>Single-use only. Never wash and reuse them.</li><li>Change when torn or dirty, before a new task, after an interruption, after handling raw meat before ready-to-eat food, and after <b>4 hours</b> of continuous use.</li></ul>"],
+  ["Cuts and wounds","<ul><li><b>Hand or wrist:</b> impermeable cover (bandage or finger cot) plus a single-use glove</li><li><b>Arm:</b> impermeable cover</li><li><b>Elsewhere:</b> dry, durable, tight-fitting bandage</li></ul>"],
+  ["Uniform and habits","<ul><li>Hair restraint; clean clothes; take off your apron when leaving the prep area</li><li>Jewelry on hands and arms: only a plain band ring. No watches or bracelets, including medical bracelets.</li><li>Eat, drink and smoke only in designated areas. Keep your drink in a covered cup with a straw, away from food.</li></ul>"],
+  ["Sick staff","<ul><li><b>Vomiting or diarrhea:</b> exclude from the operation</li><li><b>Jaundice:</b> exclude and report to the health department</li><li><b>Diagnosed with a Big 6 pathogen:</b> exclude and report</li><li><b>Sore throat with fever:</b> restrict from working with food; exclude if you serve a high-risk population</li></ul><p>Staff must tell the manager about these symptoms and diagnoses.</p>"],
+  ["Returning to work","<p>After vomiting or diarrhea, staff can return when symptom-free for <b>at least 24 hours</b> or with a written medical release.</p>","m"]
+  ],
+  qs:[
+  ["How long should the whole handwashing process take?",["At least 20 seconds","About 5 seconds","About 10 seconds total","2 minutes"],"Washing takes at least 20 seconds, including 10 to 15 seconds of scrubbing.","f"],
+  ["How long should you scrub with soap?",["10 to 15 seconds","2 to 3 seconds","At least 1 minute","Until the soap is gone"],"Scrub hands and arms for 10 to 15 seconds.","f"],
+  ["When should you use hand antiseptic?",["After washing hands, never instead of it","Instead of washing when you're busy","Before washing hands","Only after taking off gloves"],"Hand antiseptic is an extra step, not a replacement for handwashing.","f"],
+  ["Which jewelry may a food handler wear on hands and arms?",["A plain band ring","A wristwatch","A medical ID bracelet","A ring with a stone"],"Only a plain band ring is allowed. Other jewelry can hold pathogens or fall into food.","f"],
+  ["How should you handle ready-to-eat food like a sandwich?",["With gloves, tongs or deli tissue","With clean bare hands right after washing","With a clean cloth towel","With your apron"],"Bare-hand contact with ready-to-eat food is not allowed.","f"],
+  ["When must you change single-use gloves?",["As soon as they get dirty or torn","Once per shift","Only after 8 hours","Only after taking out trash"],"Also change them before a new task, after an interruption and after 4 hours of continuous use.","f"],
+  ["A cook tells you they vomited this morning. What should you do?",["Exclude them from the operation","Assign them to dishwashing","Let them work wearing gloves","Move them to the register"],"Vomiting and diarrhea mean exclusion from the operation.","f"],
+  ["A server has yellow skin and eyes (jaundice). What should the manager do?",["Exclude them and report it to the health department","Restrict them from handling food","Let them work with gloves","Nothing, if they feel fine"],"Jaundice can be a sign of Hepatitis A. Exclude and report it.","f"],
+  ["A prep cook has an infected cut on their hand. What should they do?",["Cover it with an impermeable bandage and wear a single-use glove","Leave it uncovered so it heals","Wash their hands more often","Wrap it in a cloth bandage only"],"Hand wounds need an impermeable cover plus a glove.","f"],
+  ["Where may staff eat during a shift?",["In a designated area away from food prep","At the prep table when it's slow","Next to the dish machine","In the walk-in cooler"],"Eating, drinking and smoking happen only in designated areas.","f"],
+  ["How should a cook keep a drink at their station?",["In a covered cup with a lid and straw, away from food","In an open glass on the cutting board","In the reach-in cooler next to the food","They may not have a drink at all"],"A covered container with a straw or handle prevents contamination.","f"],
+  ["At a nursing home kitchen, a cook has a sore throat with a fever. What should you do?",["Exclude them","Restrict them from food","Nothing","Have them wear gloves"],"Sore throat with fever means restriction, but exclusion when the operation serves a high-risk population.","m"],
+  ["At a regular restaurant, a cook has a sore throat with a fever. What should you do?",["Restrict them from working with or around food","Exclude them from the operation","Report them to the health department","Nothing"],"For a general population, restrict. Exclude only when serving high-risk groups.","m"],
+  ["When may a staff member who had diarrhea return to work?",["When symptom-free for at least 24 hours, or with a written medical release","After 4 hours","The next day, automatically","After taking anti-diarrhea medicine"],"The 24-hour symptom-free rule applies, or a written medical release.","m"],
+  ["A cook is diagnosed with Salmonella Typhi. What should the manager do?",["Exclude them and notify the health department","Restrict them to non-food tasks","Nothing if they have no symptoms","Have them double-glove"],"Any Big 6 diagnosis requires exclusion and reporting to the regulatory authority.","m"],
+  ["Gloves worn continuously on the same task must be changed at least every:",["4 hours","1 hour","8 hours","12 hours"],"Change gloves after 4 hours of continuous use.","m"],
+  ["Water at a handwashing sink must reach at least:",["100°F","70°F","135°F","165°F"],"The Food Code requires handwashing water of at least 100°F.","m"]
+  ]},
+{ id:"dock", name:"The Loading Dock", area:"Purchasing & receiving",
+  blurb:"Approved suppliers, receiving temperatures and what to send back on the truck.",
+  cards:[
+  ["Approved suppliers","<p>Buy only from suppliers that are inspected and meet local, state and federal laws. Schedule deliveries for slow times so you can inspect them right away.</p>"],
+  ["Receiving temperatures","<ul><li>Cold TCS food: <span class='cold'>41°F or lower</span></li><li>Hot TCS food: <span class='temp'>135°F or higher</span></li><li>Frozen food: frozen solid</li></ul><p>Check with a probe thermometer in the thickest part.</p>"],
+  ["Send it back","<ul><li>Frozen food with fluids, water stains or large ice crystals (it thawed and refroze)</li><li>Cans with swollen ends, leaks, deep dents, rust or no label</li><li>Torn packaging or signs of pests</li><li>Food at the wrong temperature or past its use-by date</li></ul>"],
+  ["Shell eggs","<p>Clean, unbroken shells, received at an air temperature of <span class='cold'>45°F or lower</span>.</p>"],
+  ["The exceptions","<ul><li><b>Live shellfish:</b> air temp <span class='cold'>45°F</span>, internal <span class='cold'>50°F</span> or lower; cool to 41°F within 4 hours</li><li><b>Shucked shellfish:</b> <span class='cold'>45°F</span> or lower; cool to 41°F within 4 hours</li><li><b>Milk:</b> <span class='cold'>45°F</span> or lower; cool to 41°F within 4 hours</li></ul>","m"],
+  ["Shellstock tags","<p>Keep shellfish identification tags for <b>90 days</b> from the date the last shellfish in the container was sold or served.</p>","m"],
+  ["Packaged and raw fish","<ul><li>For vacuum-packed food, put the probe between two packages. Don't puncture them.</li><li>Fish served raw or undercooked must be frozen correctly by the supplier to kill parasites.</li><li>When rejecting an item, set it apart, tell the driver why, and get a signed credit slip.</li></ul>","m"]
+  ],
+  qs:[
+  ["Cold TCS food should be received at:",["41°F or lower","45°F or lower","50°F or lower","32°F or lower"],"Cold TCS food arrives at 41°F or lower, with a few exceptions like live shellfish and milk.","f"],
+  ["Hot TCS food should be received at:",["135°F or higher","120°F or higher","100°F or higher","165°F or higher"],"Hot food must arrive at 135°F or higher.","f"],
+  ["A case of frozen shrimp has large ice crystals and water stains on the box. What should you do?",["Reject it","Accept it and refreeze it","Accept it and cook it today","Accept it at a discount"],"Ice crystals and water stains mean it thawed and refroze. Reject it.","f"],
+  ["A can of tomatoes has swollen ends. What should you do?",["Reject it","Accept it if the price is lower","Use it right away","Store it on the bottom shelf"],"Swollen cans can mean bacterial growth, including botulism. Reject them.","f"],
+  ["What makes a supplier 'approved'?",["It is inspected and meets local, state and federal laws","It has the lowest prices","It is the closest to your restaurant","A staff member recommends it"],"Approved suppliers are inspected and follow food laws.","f"],
+  ["A delivery arrives during the lunch rush. What should happen?",["Inspect it right away and put it away quickly","Leave it on the dock until the rush ends","Put it all in the walk-in to check tomorrow","Sign for it without checking"],"Inspect deliveries immediately and store them quickly.","f"],
+  ["Which shell egg delivery should you accept?",["Clean, unbroken eggs at an air temperature of 45°F","Cracked eggs at 41°F","Dirty eggs at 45°F","Clean eggs at 60°F"],"Shell eggs must be clean, unbroken and received at 45°F or lower air temperature.","f"],
+  ["A bag of flour has holes and droppings on it. What should you do?",["Reject it","Accept it and sift the flour","Tape the holes and store it","Use it first"],"Signs of pests mean reject.","f"],
+  ["Live oysters may be received at an air temperature of:",["45°F or lower, with internal temp 50°F or lower","41°F or lower only","60°F or lower","32°F or lower"],"Live shellfish can arrive at 45°F air and 50°F internal, then must cool to 41°F within 4 hours.","m"],
+  ["How long must you keep shellstock identification tags?",["90 days from when the last shellfish was sold or served","30 days","7 days","Until the invoice is paid"],"Tags are kept 90 days to trace outbreaks.","m"],
+  ["Milk may be received at:",["45°F or lower, then cooled to 41°F within 4 hours","50°F or lower","41°F only","Any temperature if sealed"],"Milk is one of the 45°F receiving exceptions.","m"],
+  ["How should you check the temperature of vacuum-packed meat?",["Put the probe between two packages without puncturing them","Puncture the package","Use an infrared gun on the box","Open the package"],"Placing the probe between packages keeps them sealed.","m"],
+  ["Salmon for a sushi menu must be:",["Frozen correctly by the supplier to kill parasites","Cooked to 145°F first","Rinsed in salt water","Received at 50°F"],"Fish served raw or undercooked needs parasite destruction by proper freezing.","m"],
+  ["You reject a case of chicken. What should you also do?",["Set it apart, tell the driver why, and get a signed credit slip","Throw it in the dumpster","Put it in the walk-in for later","Only tell the chef"],"Document rejections and keep rejected food away from accepted items.","m"]
+  ]},
+{ id:"walkin", name:"The Walk-in", area:"Storage & labeling",
+  blurb:"Shelf order, date marking, FIFO and keeping chemicals away from food.",
+  cards:[
+  ["Shelf order, top to bottom","<ol><li>Ready-to-eat food</li><li>Seafood <span class='temp'>145°F</span></li><li>Whole cuts of beef and pork <span class='temp'>145°F</span></li><li>Ground meat and ground fish <span class='temp'>155°F</span></li><li>Whole and ground poultry <span class='temp'>165°F</span></li></ol><p>The order follows minimum cooking temperature. Whatever needs the hottest cooking goes lowest.</p>"],
+  ["Date marking","<p>Ready-to-eat TCS food made in-house and held for more than 24 hours must be labeled. Keep it at <span class='cold'>41°F or lower</span> for a maximum of <b>7 days</b>. The day you prep it counts as day 1.</p>"],
+  ["FIFO","<p>First In, First Out. Store new deliveries behind older stock and use the oldest first.</p>"],
+  ["Where food goes","<ul><li>At least <b>6 inches</b> off the floor</li><li>Never in restrooms, locker rooms, mechanical rooms, under stairs or under leaking pipes</li><li>Cold TCS at <span class='cold'>41°F or lower</span>; frozen food frozen solid</li><li>Don't overload coolers. Air has to circulate.</li></ul>"],
+  ["Chemicals","<p>Store chemicals in a separate area, <b>away from and below</b> food and food-contact surfaces.</p>"],
+  ["Combining batches","<p>If you mix ingredients with different dates, the mix takes the date of the <b>earliest-prepared</b> ingredient.</p>","m"]
+  ],
+  qs:[
+  ["Which item belongs on the bottom shelf of the walk-in?",["Raw chicken","Washed lettuce","Salmon fillets","Ribeye steaks"],"Poultry needs the highest cooking temperature (165°F), so it goes lowest.","f"],
+  ["What goes on the top shelf, above raw meat?",["Ready-to-eat food","Ground beef","Raw chicken","Raw fish"],"Ready-to-eat food goes on top so nothing raw can drip on it.","f"],
+  ["Food in storage must be at least how far off the floor?",["6 inches","1 inch","12 inches","2 feet"],"Keep food at least 6 inches off the floor.","f"],
+  ["What does FIFO mean?",["Use the oldest food first","Use the newest food first","Freeze items in the first open space","Fill the cooler from front to back"],"First In, First Out: new stock goes behind older stock.","f"],
+  ["Cold TCS food in storage must be held at:",["41°F or lower","45°F or lower","50°F or lower","32°F or lower"],"41°F or lower keeps cold food out of the danger zone.","f"],
+  ["Where should cleaning chemicals be stored?",["Away from and below food","On a shelf above the prep table","Next to the spices","In the walk-in"],"Store chemicals where they can't drip or spill onto food.","f"],
+  ["Which is an acceptable place to store food?",["A clean dry-storage room, 6 inches off the floor","Under a leaking pipe","In the staff restroom","On the floor of the walk-in"],"Food can never go in restrooms or under leaking pipes.","f"],
+  ["Ready-to-eat TCS food made in-house can be held at 41°F for at most:",["7 days","3 days","14 days","30 days"],"The date-marking limit is 7 days at 41°F or lower.","f"],
+  ["A cook preps chicken salad on the 1st of the month. What is the last day it can be served?",["The 7th","The 8th","The 6th","The 14th"],"The prep day counts as day 1, so day 7 is the 7th.","m"],
+  ["Which item goes on the shelf directly above ground beef?",["Whole cuts of beef and pork","Whole chickens","Ground turkey","Nothing goes above ground beef"],"Whole cuts (145°F) go above ground meat (155°F).","m"],
+  ["You combine tuna salad made on the 3rd with a batch made on the 5th. What date goes on the label?",["The 3rd, the earliest-prepared batch","The 5th","Today's date","No label is needed"],"A combined batch takes the date of the earliest-prepared ingredient.","m"],
+  ["Shelf order in the cooler is based on:",["Minimum internal cooking temperature","How heavy the item is","When it was delivered","Price"],"Food needing the highest cooking temperature goes lowest.","m"]
+  ]},
+{ id:"line", name:"The Hot Line", area:"Prep, thawing & cooking temps",
+  blurb:"Cooking temperatures, safe thawing, cross-contamination and using thermometers.",
+  cards:[
+  ["Cooking temperatures","<ul><li><span class='temp'>165°F</span> for &lt;1 sec: poultry, stuffing, stuffed meats and pasta, dishes with previously cooked TCS ingredients</li><li><span class='temp'>155°F</span> for 17 sec: ground meat, ground seafood, injected or tenderized meat, eggs for hot holding</li><li><span class='temp'>145°F</span> for 15 sec: seafood, steaks and chops, eggs served right away</li><li><span class='temp'>135°F</span>: fruits, vegetables, grains and beans cooked for hot holding</li></ul>"],
+  ["Safe thawing","<ul><li>In the cooler at <span class='cold'>41°F or lower</span></li><li>Under running drinkable water at <span class='cold'>70°F or lower</span></li><li>In the microwave, if you cook it right away</li><li>As part of cooking</li></ul><p>Never on the counter.</p>"],
+  ["Cross-contamination","<ul><li>Separate cutting boards and utensils for raw meat and ready-to-eat food, or clean and sanitize between uses</li><li>Prep raw meat and ready-to-eat food at different times or places</li><li>Keep produce away from raw meat</li></ul>"],
+  ["Thermometers","<ul><li>Check the thickest part of the food</li><li>Calibrate with the ice-point method: <span class='cold'>32°F</span></li><li>Clean and sanitize before and after each use</li></ul>"],
+  ["Ice","<p>Never use ice that cooled food as an ingredient. Use a scoop with a handle, never a glass.</p>"],
+  ["More manager temps","<ul><li>Roasts of beef and pork: <span class='temp'>145°F for 4 minutes</span></li><li>Raw meat in a microwave: <span class='temp'>165°F</span>, covered, stirred or rotated, then stand 2 minutes</li><li>Thermometers must be accurate to <b>±2°F</b></li></ul>","m"],
+  ["Partial cooking and advisories","<ul><li>Partial cooking: no more than 60 minutes at first, cool right away, then cook fully before serving.</li><li>Raw or undercooked menu items need a consumer advisory with a <b>disclosure</b> (which items) and a <b>reminder</b> (the risk).</li></ul>","m"]
+  ],
+  qs:[
+  ["What is the minimum internal cooking temperature for chicken?",["165°F","155°F","145°F","135°F"],"All poultry must reach 165°F.","f"],
+  ["What is the minimum internal cooking temperature for a hamburger?",["155°F for 17 seconds","145°F for 15 seconds","165°F for 1 second","135°F"],"Ground meat must reach 155°F for 17 seconds.","f"],
+  ["What is the minimum internal cooking temperature for a salmon fillet?",["145°F for 15 seconds","155°F for 17 seconds","165°F","135°F"],"Seafood fillets reach 145°F for 15 seconds.","f"],
+  ["Which is a safe way to thaw frozen turkey?",["In the cooler at 41°F or lower","On the counter overnight","In a sink of warm water","In a hot-holding cabinet"],"Thaw in the cooler, under cold running water, in the microwave (then cook) or as part of cooking.","f"],
+  ["When thawing under running water, the water must be:",["70°F or lower","100°F","Any temperature","135°F"],"Use drinkable running water at 70°F or lower.","f"],
+  ["Food thawed in the microwave must be:",["Cooked immediately","Refrozen","Held in the cooler for a day","Served cold"],"Microwave thawing warms parts of the food, so cook it right away.","f"],
+  ["You just cut raw chicken. What must happen before you slice tomatoes on that board?",["Clean and sanitize the board, or use a different one","Wipe it with a towel","Rinse it with water","Nothing if the board is plastic"],"Clean and sanitize between raw meat and ready-to-eat food.","f"],
+  ["Where should you check the temperature of a roast?",["The thickest part","The edge","The surface","The juices in the pan"],"The thickest part is the last to reach temperature.","f"],
+  ["The ice-point method calibrates a thermometer to:",["32°F","0°F","41°F","212°F"],"Put the probe in ice water and adjust to 32°F.","f"],
+  ["Rice cooked to be hot-held must reach at least:",["135°F","145°F","155°F","165°F"],"Fruits, vegetables, grains and beans cooked for hot holding need 135°F.","f"],
+  ["What is the cooking requirement for a pork roast?",["145°F for 4 minutes","155°F for 17 seconds","165°F for 1 second","135°F"],"Roasts of beef, pork, veal and lamb reach 145°F for 4 minutes.","m"],
+  ["What is the cooking requirement for a brine-injected ham?",["155°F for 17 seconds","145°F for 15 seconds","165°F","135°F"],"Injected and mechanically tenderized meats reach 155°F for 17 seconds.","m"],
+  ["A casserole contains previously cooked chicken and ham. It must reach:",["165°F","155°F","145°F","135°F"],"Dishes made with previously cooked TCS ingredients must reach 165°F.","m"],
+  ["Raw meat cooked in a microwave must reach:",["165°F, covered and rotated, then stand 2 minutes","145°F with no standing time","155°F for 17 seconds","135°F"],"Microwaves heat unevenly, so the rule is 165°F, covered, stirred or rotated, then a 2-minute stand.","m"],
+  ["When partially cooking food to finish later, the first cook must not exceed:",["60 minutes","2 hours","4 hours","15 minutes"],"Cook no more than 60 minutes at first, then cool it right away.","m"],
+  ["Shell eggs cooked to be hot-held for service must reach:",["155°F for 17 seconds","145°F for 15 seconds","135°F","165°F"],"Eggs served right away need 145°F; eggs for hot holding need 155°F.","m"],
+  ["A menu offers burgers cooked to order. What must the menu include?",["A consumer advisory with a disclosure and a reminder","Only the price","A calorie count only","Nothing extra"],"Raw or undercooked items need a disclosure and a reminder.","m"],
+  ["Food thermometers must be accurate to within:",["±2°F","±10°F","±5°F","±0.1°F"],"Thermometers used for food must be accurate to ±2°F.","m"]
+  ]},
+{ id:"pass", name:"The Pass", area:"Holding, cooling, reheating & service",
+  blurb:"Hot and cold holding, two-stage cooling, reheating and serving food safely.",
+  cards:[
+  ["Holding","<ul><li>Hot food: <span class='temp'>135°F or higher</span></li><li>Cold food: <span class='cold'>41°F or lower</span></li><li>Check temperatures at least every <b>4 hours</b>. Every 2 hours gives time to fix problems.</li></ul>"],
+  ["Cooling in two stages","<ul><li><span class='temp'>135°F</span> to <span class='cold'>70°F</span> within <b>2 hours</b></li><li><span class='cold'>70°F</span> to <span class='cold'>41°F</span> within the <b>next 4 hours</b></li></ul><p>6 hours total. If it misses 70°F at 2 hours, reheat and start over, or throw it out.</p>"],
+  ["How to cool fast","<ul><li>Ice-water bath or ice paddle</li><li>Blast chiller</li><li>Divide into smaller batches or shallow pans</li><li>Add ice as an ingredient</li></ul><p>Never leave a full stockpot on the counter or in the walk-in to cool.</p>"],
+  ["Reheating","<p>Food reheated for hot holding must reach <span class='temp'>165°F for 15 seconds</span> within <b>2 hours</b>.</p>"],
+  ["Serving","<ul><li>Hold glasses by the base, plates by the edge, utensils by the handle</li><li>Use a fresh plate for every trip to a self-serve bar</li><li>Never re-serve returned food, except unopened packaged items like condiment packets</li></ul>"],
+  ["Time without temperature control","<ul><li><b>Hot food:</b> up to 4 hours, then throw it out</li><li><b>Cold food:</b> up to 6 hours if it starts at 41°F or lower and never goes above 70°F</li><li>Label it with the time it must be thrown out</li></ul>","m"],
+  ["Manager details","<ul><li>Commercially processed ready-to-eat food reheated for hot holding: <span class='temp'>135°F</span></li><li>Sneeze guards: 14 inches above the counter, extending 7 inches beyond the food</li><li>Hot food below 135°F for an unknown time: throw it out</li></ul>","m"]
+  ],
+  qs:[
+  ["Hot-held food must stay at:",["135°F or higher","120°F or higher","100°F or higher","165°F or higher"],"Hot holding is 135°F or higher.","f"],
+  ["Cold-held food must stay at:",["41°F or lower","45°F or lower","50°F or lower","32°F or lower"],"Cold holding is 41°F or lower.","f"],
+  ["How often must you check held food temperatures?",["At least every 4 hours","Once a shift","Every 8 hours","Only at opening"],"At least every 4 hours. Every 2 hours leaves time to fix problems.","f"],
+  ["What is the best way to cool a large pot of chili?",["Divide it into shallow pans or use an ice-water bath","Leave it on the counter overnight","Put the full pot in the walk-in with a lid on","Put the full pot in the freezer"],"Smaller, shallower portions and ice baths cool food fast enough.","f"],
+  ["How should you carry clean glasses to a table?",["By the base or stem","By the rim","Stacked inside each other","With fingers inside"],"Never touch surfaces that guests' mouths touch.","f"],
+  ["A guest goes back to the buffet. What should they use?",["A clean plate","Their used plate","A napkin","Any plate on the table"],"Used plates can contaminate the food on the buffet.","f"],
+  ["Which item returned from a table can be served to another guest?",["An unopened packet of ketchup","An untouched bread basket","A garnish that wasn't eaten","Butter pats that look clean"],"Only unopened, packaged items can be re-served.","f"],
+  ["Food reheated for hot holding must reach:",["165°F for 15 seconds","135°F","145°F","155°F"],"Reheat to 165°F for 15 seconds within 2 hours.","f"],
+  ["In the first cooling stage, food must go from 135°F to 70°F within:",["2 hours","4 hours","6 hours","1 hour"],"Stage one is 2 hours. That's the range where bacteria grow fastest.","m"],
+  ["What is the total time allowed to cool food from 135°F to 41°F?",["6 hours","4 hours","2 hours","8 hours"],"2 hours to 70°F, then 4 more to 41°F.","m"],
+  ["Beef stew has been cooling for 2 hours and is at 80°F. What should you do?",["Reheat it to 165°F and start cooling again, or throw it out","Keep cooling it for 4 more hours","Put it straight in the freezer","Serve it right away"],"It missed the 2-hour, 70°F deadline.","m"],
+  ["Reheating for hot holding must finish within:",["2 hours","4 hours","30 minutes","6 hours"],"Food must reach 165°F within 2 hours.","m"],
+  ["Hot food held without temperature control must be thrown out after:",["4 hours","6 hours","2 hours","8 hours"],"Hot food can go 4 hours without temperature control.","m"],
+  ["Cold food held without temperature control can be held for up to 6 hours if:",["It starts at 41°F or lower and never goes above 70°F","It is covered","It stays below 100°F","It is in a cooler bag"],"Label it and throw it out once it passes 70°F or reaches 6 hours.","m"],
+  ["Sneeze guards must be how high above the counter?",["14 inches, extending 7 inches beyond the food","6 inches, extending 2 inches","24 inches, extending 12 inches","Any height"],"14 inches high and 7 inches past the front of the food.","m"],
+  ["Canned chili, commercially processed, reheated for hot holding must reach at least:",["135°F","165°F","155°F","145°F"],"Commercially processed ready-to-eat food only needs 135°F.","m"],
+  ["Hot-held soup reads 128°F and no one knows how long it has been there. What should you do?",["Throw it out","Reheat it to 165°F","Stir it and serve it","Turn up the steam table"],"If you can't confirm how long it sat in the danger zone, throw it out.","m"]
+  ]},
+{ id:"dish", name:"The Dish Pit", area:"Cleaning & sanitizing",
+  blurb:"Cleaning versus sanitizing, the three-compartment sink and chemical safety.",
+  cards:[
+  ["Cleaning vs. sanitizing","<p><b>Cleaning</b> removes food and dirt. <b>Sanitizing</b> reduces pathogens to safe levels. Food-contact surfaces need both.</p>"],
+  ["When to clean and sanitize","<ul><li>After every use</li><li>Before working with a different type of food</li><li>After an interruption</li><li>At least every <b>4 hours</b> if in constant use</li></ul>"],
+  ["Five steps","<ol><li>Scrape or remove food</li><li>Wash</li><li>Rinse</li><li>Sanitize</li><li>Air-dry</li></ol><p>Never towel-dry.</p>"],
+  ["Three-compartment sink","<ul><li>Scrape and pre-rinse</li><li>Sink 1: wash in detergent, at least <span class='temp'>110°F</span></li><li>Sink 2: rinse in clean water</li><li>Sink 3: sanitize, chemical or hot water at <span class='temp'>171°F for 30 seconds</span></li><li>Air-dry</li></ul>"],
+  ["Chemical sanitizers","<p>Chlorine, iodine and quats. Check strength with a test kit and follow the label for concentration and contact time. Too much sanitizer can be unsafe and corrode equipment.</p>"],
+  ["Cloths, mops and chemicals","<ul><li>Keep wet wiping cloths in sanitizer solution between uses</li><li>Dump mop water in a mop or utility sink, never a prep or handwashing sink</li><li>Label every working container with the chemical's common name</li><li>Safety Data Sheets (SDS) must be available to staff</li></ul>"],
+  ["Manager details","<ul><li>High-temperature dish machine final rinse: <span class='temp'>180°F</span> (165°F for single-temperature stationary rack)</li><li>Factors that affect sanitizers: concentration, temperature, contact time, water hardness, pH</li><li>The operation needs a written plan for cleaning up vomit and diarrhea</li></ul>","m"]
+  ],
+  qs:[
+  ["What is the difference between cleaning and sanitizing?",["Cleaning removes dirt; sanitizing reduces pathogens to safe levels","They mean the same thing","Sanitizing removes dirt; cleaning kills germs","Cleaning uses hot water; sanitizing uses cold"],"You need both, in that order.","f"],
+  ["A slicer is used all day for deli meat. It must be cleaned and sanitized at least every:",["4 hours","8 hours","Hour","Shift"],"Surfaces in constant use: at least every 4 hours.","f"],
+  ["What is the right order for cleaning and sanitizing a surface?",["Scrape, wash, rinse, sanitize, air-dry","Wash, sanitize, rinse, dry","Sanitize, wash, rinse, towel-dry","Rinse, sanitize, wash"],"Sanitizer works best on a clean, rinsed surface.","f"],
+  ["How should cleaned and sanitized dishes be dried?",["Air-dried","With a clean towel","With paper towels","With an apron"],"Towels can re-contaminate dishes.","f"],
+  ["Where should damp wiping cloths be kept between uses?",["In a sanitizer solution","On the cutting board","In an apron pocket","On the counter"],"Store them in sanitizer, and change the solution regularly.","f"],
+  ["A spray bottle of degreaser from a bulk container must be:",["Labeled with the chemical's common name","Kept unlabeled if everyone knows it","Stored above the prep area","Refilled with water to dilute it"],"Every working container needs a label.","f"],
+  ["Where should dirty mop water be dumped?",["In a mop or utility sink","In the handwashing sink","In a prep sink","Outside the back door"],"Never in prep or handwashing sinks.","f"],
+  ["How do you check that sanitizer solution is the right strength?",["Use a test kit or test strips","Smell it","Look at the color","Feel it"],"Test kits are the only way to know the concentration.","f"],
+  ["When sanitizing with hot water in a three-compartment sink, the water must be at least:",["171°F, with items soaking 30 seconds","135°F for 10 seconds","110°F for 1 minute","212°F"],"Hot-water manual sanitizing is 171°F for 30 seconds.","m"],
+  ["The wash sink of a three-compartment sink must be at least:",["110°F","70°F","171°F","135°F"],"Detergent water at least 110°F.","m"],
+  ["In a high-temperature dish machine, the final sanitizing rinse must be at least:",["180°F","135°F","150°F","212°F"],"180°F, or 165°F for single-temperature stationary rack machines.","m"],
+  ["What happens if you use too much chemical sanitizer?",["It can be unsafe and corrode surfaces","It works better","Nothing","It sanitizes faster"],"More is not better. Follow the label.","m"],
+  ["What is a Safety Data Sheet (SDS)?",["A document describing a chemical's hazards and safe handling","A cleaning schedule","A health inspection report","A recipe card"],"SDS must be available for each chemical you use.","m"],
+  ["The Food Code requires operations to have:",["A written plan for cleaning up vomit and diarrhea","A dishwasher in every station","Colored cutting boards","Bleach only"],"Norovirus spreads easily, so cleanup must follow a written plan.","m"]
+  ]},
+{ id:"building", name:"Back of House", area:"Facilities, pests & emergencies",
+  blurb:"Handwashing stations, pest control, garbage and what to do when the power goes out.",
+  cards:[
+  ["Handwashing stations","<p>Hot and cold running water, soap, single-use towels or a hand dryer, a garbage container and a handwashing sign. Use handwashing sinks <b>only</b> for washing hands.</p>"],
+  ["Integrated pest management","<ul><li>Deny pests <b>access</b>: inspect deliveries, seal gaps, self-closing doors, screens</li><li>Deny pests <b>food and shelter</b>: clean up, store food properly, handle garbage</li><li>Work with a <b>licensed pest control operator</b>. Only they apply pesticides.</li></ul>"],
+  ["Signs of pests","<ul><li><b>Cockroaches:</b> strong oily smell; droppings like black pepper; egg cases</li><li><b>Rodents:</b> gnaw marks, droppings, nests, tracks</li></ul>"],
+  ["Garbage","<p>Use leak-proof, waterproof, pest-proof containers with tight lids. Clean them often, away from food prep.</p>"],
+  ["Emergencies","<p>Imminent health hazards: power outage, no water, sewage backup, fire, flood, serious pest infestation. Stop service and tell the manager right away.</p>"],
+  ["Manager details","<ul><li>An <b>air gap</b> is the only completely reliable way to prevent backflow</li><li>Screens on windows and vents: at least 16 mesh per inch</li><li>For an imminent health hazard, stop service in the affected area and notify the regulatory authority</li></ul>","m"]
+  ],
+  qs:[
+  ["What can a handwashing sink be used for?",["Only washing hands","Rinsing produce","Dumping mop water","Thawing food"],"Handwashing sinks are only for handwashing.","f"],
+  ["Which is a sign of cockroaches?",["A strong oily smell and droppings like black pepper","Gnawed wires","Feathers","Sawdust piles"],"Cockroaches leave a strong oily odor and pepper-like droppings.","f"],
+  ["Who should apply pesticides in a restaurant?",["A licensed pest control operator","The manager","The dishwasher","Any trained staff member"],"Only licensed operators should apply pesticides.","f"],
+  ["Garbage containers should be:",["Leak-proof, waterproof and pest-proof, with tight lids","Open for easy access","Kept in the prep area","Lined with paper"],"Tight lids keep pests out.","f"],
+  ["Sewage is backing up through a floor drain in the kitchen. What should you do?",["Stop working and tell the manager immediately","Mop it up and keep cooking","Put down towels","Ignore it until closing"],"Sewage backup is an imminent health hazard.","f"],
+  ["Which is a sign of rodents?",["Gnaw marks and droppings","A sour smell from the dish machine","Ice buildup in the freezer","Cloudy sanitizer"],"Rodents leave gnaw marks, droppings, nests and tracks.","f"],
+  ["What are the three rules of pest prevention?",["Deny them access, food and shelter","Spray, trap and ignore","Clean weekly, spray monthly, call yearly","Close windows, turn off lights, lock doors"],"Integrated pest management works by keeping pests out and giving them nothing to live on.","f"],
+  ["Which item must a handwashing station have?",["Soap and a way to dry hands","A cutting board","A sanitizer bucket","A food thermometer"],"Water, soap, drying, a garbage can and a sign.","f"],
+  ["What is the only completely reliable way to prevent backflow?",["An air gap","A vacuum breaker","A check valve","A floor drain"],"An air gap physically separates the water supply from the drain.","m"],
+  ["The power goes out during dinner service. What should the manager do?",["Stop service and notify the regulatory authority","Keep serving by candlelight","Move all food to the counter","Wait for it to come back on"],"Power loss is an imminent health hazard.","m"],
+  ["Which is an imminent health hazard that requires stopping service?",["Sewage backup in the kitchen","A burned-out light bulb in dry storage","Low stock of paper towels","A cracked floor tile"],"Imminent hazards threaten food safety right now.","m"],
+  ["Screens on windows and vents should be at least:",["16 mesh per inch","4 mesh per inch","2 mesh per inch","Any screen"],"16 mesh keeps most insects out.","m"],
+  ["Integrated pest management (IPM) means:",["Preventing pests and working with a licensed operator to control them","Spraying pesticides every week","Setting traps only","Calling an exterminator after you see pests"],"IPM is prevention plus professional control.","m"]
+  ]},
+{ id:"system", name:"The Manager's Office", area:"HACCP & active managerial control", mgrOnly:true,
+  blurb:"The seven HACCP principles, active managerial control, inspections and handling illness complaints.",
+  cards:[
+  ["Active managerial control","<p>Proactively control the five CDC risk factors:</p><ul><li>Buying from unsafe sources</li><li>Not cooking food enough</li><li>Holding food at wrong temperatures</li><li>Using contaminated equipment</li><li>Poor personal hygiene</li></ul><p>Monitor, fix problems, train staff and check that it all works.</p>"],
+  ["HACCP: the seven principles","<ol><li>Conduct a hazard analysis</li><li>Find the critical control points (CCPs)</li><li>Set critical limits</li><li>Set monitoring procedures</li><li>Identify corrective actions</li><li>Verify that the system works</li><li>Keep records</li></ol>"],
+  ["CCPs and limits","<p>A <b>CCP</b> is a step where a hazard can be prevented, eliminated or reduced to safe levels, like cooking. A <b>critical limit</b> is the number that must be met, like 165°F for chicken. A <b>corrective action</b> is what you do when it isn't met, like cooking longer.</p>"],
+  ["When you need a HACCP plan or variance","<ul><li>Smoking food to preserve it (not just for flavor)</li><li>Using additives or vinegar to make food shelf-stable</li><li>Curing food</li><li>Reduced-oxygen packaging</li><li>Sprouting seeds or beans</li><li>Live shellfish display tanks</li><li>Custom-processing animals</li></ul>"],
+  ["Outbreaks and complaints","<p>An <b>outbreak</b> is two or more people getting the same illness from the same food, confirmed by investigation.</p><p>When a guest reports illness: get their contact info, what they ate and their symptoms; set aside suspect food labeled 'Do not use, do not discard'; contact the regulatory authority if needed.</p>"],
+  ["Inspections","<p>Ask for the inspector's ID, go with them, take notes, answer questions and fix violations. Keep the report. Inspectors can close you down for imminent health hazards.</p><p>Food defense: the FDA's ALERT tool helps prevent deliberate contamination.</p>"]
+  ],
+  qs:[
+  ["What is the first HACCP principle?",["Conduct a hazard analysis","Set critical limits","Keep records","Identify corrective actions"],"Everything starts with identifying the hazards.","m"],
+  ["What is a critical control point (CCP)?",["A step where a hazard can be prevented, eliminated or reduced to safe levels","Any step in a recipe","The point where food is served","A manager's signature on a log"],"Cooking and cooling are common CCPs.","m"],
+  ["Which is an example of a critical limit?",["Cooking chicken to 165°F","Using a red cutting board","Washing hands","Labeling food"],"A critical limit is a measurable value that must be met at a CCP.","m"],
+  ["Which HACCP principle comes right after 'set critical limits'?",["Set monitoring procedures","Verify the system works","Conduct a hazard analysis","Keep records"],"After setting limits, decide how you'll check them.","m"],
+  ["Chicken breasts measure 150°F at the end of cooking. Which is the right corrective action?",["Keep cooking until they reach 165°F","Serve them anyway","Throw out the thermometer","Write it down and move on"],"Corrective actions fix the problem when a critical limit isn't met.","m"],
+  ["Which activity requires a variance from the regulatory authority?",["Smoking food to preserve it","Grilling steaks","Baking bread","Making a salad"],"Smoking as preservation, curing, ROP and similar processes need a variance and usually a HACCP plan.","m"],
+  ["What is a foodborne-illness outbreak?",["Two or more people with the same illness after eating the same food, confirmed by investigation","Any guest complaint","One person getting sick","A health inspection failure"],"It takes two or more cases and an investigation.","m"],
+  ["A guest calls saying they got sick after eating your shrimp. What should you do first?",["Record their details, symptoms and what they ate, and set aside the suspect food","Tell them it wasn't your food","Throw out all the shrimp","Offer a free meal and do nothing else"],"Document everything and keep suspect food labeled 'Do not use, do not discard'.","m"],
+  ["Which is one of the five most common risk factors for foodborne illness?",["Holding food at incorrect temperatures","Using paper menus","Serving bottled water","Having a small kitchen"],"The other four: unsafe sources, undercooking, contaminated equipment, poor hygiene.","m"],
+  ["Active managerial control means:",["Controlling risk factors proactively with monitoring and corrective action","Reacting after an inspection","Hiring more staff","Buying new equipment"],"It's about preventing problems before they happen.","m"],
+  ["A health inspector arrives. What should the manager do first?",["Ask for identification","Refuse entry until the chef arrives","Close the kitchen","Call the owner and wait"],"Confirm their ID, then go with them during the inspection.","m"],
+  ["Reviewing temperature logs and checking thermometer calibration is part of which HACCP principle?",["Verify that the system works","Conduct a hazard analysis","Set critical limits","Find the CCPs"],"Verification confirms the plan is working.","m"],
+  ["The FDA's ALERT tool helps managers with:",["Food defense, preventing deliberate contamination","Allergen labeling","Calorie counts","Staff scheduling"],"ALERT: Assure, Look, Employees, Reports, Threat.","m"],
+  ["Which HACCP principle covers keeping temperature logs and corrective action records?",["Keep records (principle 7)","Hazard analysis (principle 1)","Set critical limits (principle 3)","Identify CCPs (principle 2)"],"Record keeping is the final principle.","m"]
+  ]}
+];
+
+const BIG9 = ["Milk","Eggs","Fish","Crustacean shellfish","Tree nuts","Peanuts","Wheat","Soy","Sesame"];
+const DISHES = [
+  ["Pad Thai","Rice noodles, scrambled egg, crushed peanuts, fish sauce, shrimp, lime",["Eggs","Peanuts","Fish","Crustacean shellfish"]],
+  ["Caesar Salad","Romaine, parmesan, wheat croutons, dressing made with anchovies and egg yolk",["Milk","Wheat","Fish","Eggs"]],
+  ["Hummus Plate","Chickpeas, tahini, olive oil, lemon, wheat pita",["Sesame","Wheat"]],
+  ["Miso Soup","Miso paste (soybeans), tofu, seaweed, scallions",["Soy"]],
+  ["Pesto Pasta","Basil, pine nuts, parmesan, olive oil, wheat pasta",["Tree nuts","Milk","Wheat"]],
+  ["Lobster Roll","Lobster, mayonnaise (egg), butter, brioche bun (wheat, egg, milk)",["Crustacean shellfish","Eggs","Milk","Wheat"]],
+  ["Fruit Cup","Melon, strawberries, grapes, mint",[]],
+  ["Almond-Crusted Cod","Cod, ground almonds, egg wash, butter",["Fish","Tree nuts","Eggs","Milk"]],
+  ["Sesame Edamame","Steamed edamame (soybeans), sesame seeds, sea salt",["Soy","Sesame"]],
+  ["Chicken Satay","Grilled chicken, peanut sauce, soy sauce (soy and wheat), lime",["Peanuts","Soy","Wheat"]],
+  ["Garden Salad","Mixed greens, cucumber, tomato, red onion, olive oil and vinegar",[]],
+  ["Crab Cakes","Crab meat, breadcrumbs (wheat), egg, mayonnaise (egg), Old Bay",["Crustacean shellfish","Wheat","Eggs"]]
+];
+const TEMPS = [
+  ["Chicken breast",165],["Ground beef burger",155],["Pork chop",145],["Salmon fillet",145],["Hot holding, minimum",135],
+  ["Cold holding, maximum",41],["Reheating for hot holding",165],["Green beans cooked for hot holding",135],["Stuffed pasta",165],
+  ["Brine-injected ham",155],["Eggs served right away",145],["Cooling: stage 1 target",70],["Cooling: final target",41],
+  ["Manual hot-water sanitizing",171],["Handwashing water, minimum",100],["Three-compartment wash water, minimum",110],
+  ["Ice-point calibration",32],["Top of the danger zone",135],["Live oysters, receiving air temp",45],["Raw meat cooked in a microwave",165],
+  ["Ground pork sausage",155],["Turkey stuffing",165],["Shrimp",145],["Thawing under running water, maximum",70]
+];
+const TEMP_CHOICES = [32,41,45,70,100,110,135,145,155,165,171,180];
+const COOLER = [
+  ["Ready-to-eat","top shelf",["Potato salad","Sliced cheese","Washed lettuce","Cut fruit"]],
+  ["Seafood","cook to 145°F",["Salmon fillets","Shrimp","Tuna steaks","Cod"]],
+  ["Whole cuts of beef & pork","cook to 145°F",["Ribeye steaks","Pork chops","Beef brisket","Pork loin"]],
+  ["Ground meat & fish","cook to 155°F",["Ground beef","Ground pork","Pork sausage","Ground fish patties"]],
+  ["Poultry","cook to 165°F",["Whole chickens","Turkey breasts","Ground turkey","Duck legs"]]
+];
+const BAR = [
+  ["Which equals one standard drink?",["12 oz of 5% beer","24 oz of 5% beer","10 oz of 12% wine","3 oz of 80-proof liquor"],"12 oz beer, 5 oz wine and 1.5 oz of 80-proof spirits each hold about the same alcohol."],
+  ["What is the only thing that lowers blood alcohol content (BAC)?",["Time","Coffee","A cold shower","Eating a big meal"],"The liver processes alcohol at a fixed rate. Coffee and showers don't speed it up."],
+  ["Which is an acceptable ID in most states?",["A valid, unexpired government-issued photo ID with a date of birth","A student ID","A photocopy of a driver's license","A credit card with a photo"],"Driver's licenses, state IDs, passports and military IDs are typical. Check your state's rules."],
+  ["How does food in the stomach affect alcohol?",["It slows absorption into the bloodstream","It speeds absorption","It stops absorption","It has no effect"],"Food slows absorption but doesn't prevent intoxication."],
+  ["A guest is slurring words and stumbling. What should you do?",["Stop serving alcohol, offer food and water, and help arrange a safe ride","Serve one more drink, then cut them off","Switch them to a weaker drink","Ignore it if they're polite"],"Stop service, involve your manager and make sure they get home safely."],
+  ["What is the legal drinking age everywhere in the U.S.?",["21","18","19","20"],"Every state sets 21 as the minimum."],
+  ["What are dram shop laws?",["Laws that can hold servers and businesses liable for harm caused by guests they over-served","Rules about glass sizes","Laws about bar opening hours","Tax rules for liquor"],"Servers and businesses can be sued for damage caused by guests they served irresponsibly."],
+  ["A guest hands you an ID that expired last month. What should you do in most states?",["Refuse it as invalid","Accept it since it's recent","Accept it if they look over 21","Ask for a second expired ID"],"An expired ID generally isn't valid proof of age."]
+];
+const BADGES = [
+  ["first","FT","First Ticket","Pass any station check."],
+  ["perfect","SP","Spotless","Score 100% on a station check."],
+  ["line_fh","FH","Full Line: Handler","Pass every Food Handler station."],
+  ["line_mgr","FM","Full Line: Manager","Pass every Manager station."],
+  ["final_fh","CR","Card Ready","Pass the Food Handler final inspection."],
+  ["final_mgr","MR","Manager Ready","Pass the Manager final inspection."],
+  ["allergen","AA","Allergen Ace","Spot every allergen in all 6 dishes."],
+  ["temp","PM","Probe Master","Score 12 or more in Temp Rush."],
+  ["cooler","SB","Shelf Boss","Stack all 5 coolers correctly."],
+  ["bar","BC","Carded","Pass the Bar Card quest."],
+  ["review","WS","Weak Spot Fixed","Clear 5 missed questions."],
+  ["streak","3D","On the Line","Study 3 days in a row."],
+  ["study","SH","Study Hall","Complete 10 study drills."]
+];
+
+/* ---------- Study pictures and drills ---------- */
+function thermoPic(){
+  const y = t => 400-(t-30)*(380/145);
+  const marks = [[165,"Poultry · stuffing · reheating"],[155,"Ground & injected meat"],[145,"Seafood · steaks · chops"],[135,"Hot holding · veg & grains"],[70,"Cooling checkpoint"],[41,"Cold holding"],[32,"Ice point (calibration)"]];
+  return `<figure class="fig"><svg viewBox="0 0 400 450" role="img" aria-label="Thermometer showing key food safety temperatures">
+    <rect x="40" y="${y(135)}" width="356" height="${y(41)-y(135)}" rx="6" class="f-dz"/>
+    <text x="390" y="${(y(135)+y(41))/2+4}" text-anchor="end" class="s-dz">DANGER ZONE</text>
+    <rect x="60" y="14" width="26" height="392" rx="13" class="f-tube"/>
+    <rect x="67" y="${y(165)}" width="12" height="${410-y(165)}" rx="6" class="f-merc"/>
+    <circle cx="73" cy="418" r="22" class="f-merc"/>
+    ${marks.map(([t,l]) => `<line x1="86" x2="100" y1="${y(t)}" y2="${y(t)}" class="s-tick"/><text x="104" y="${y(t)+5}" class="s-temp">${t}°F</text><text x="160" y="${y(t)+5}" class="s-lbl">${l}</text>`).join("")}
+  </svg></figure>`;
+}
+function coolPic(){
+  const x = h => 50+h*50, y = t => 190-(t-41)*(150/94);
+  return `<figure class="fig"><svg viewBox="0 0 360 225" role="img" aria-label="Two-stage cooling: 135 to 70 degrees in 2 hours, then 70 to 41 degrees in 4 more hours">
+    <rect x="${x(0)}" y="20" width="${x(2)-x(0)}" height="170" class="f-st1"/>
+    <rect x="${x(2)}" y="20" width="${x(6)-x(2)}" height="170" class="f-st2"/>
+    <text x="${(x(0)+x(2))/2}" y="34" text-anchor="middle" class="s-st1">Stage 1 · 2 hrs</text>
+    <text x="${(x(2)+x(6))/2}" y="34" text-anchor="middle" class="s-st2">Stage 2 · 4 more hrs</text>
+    ${[135,70,41].map(t => `<line x1="${x(0)}" x2="${x(6)}" y1="${y(t)}" y2="${y(t)}" class="s-grid"/><text x="${x(0)-6}" y="${y(t)+4}" text-anchor="end" class="s-axis">${t}°F</text>`).join("")}
+    ${[0,2,6].map(h => `<text x="${x(h)}" y="212" text-anchor="middle" class="s-axis">${h} h</text>`).join("")}
+    <polyline points="${x(0)},${y(135)} ${x(2)},${y(70)} ${x(6)},${y(41)}" class="s-line"/>
+    ${[[0,135],[2,70],[6,41]].map(([h,t]) => `<circle cx="${x(h)}" cy="${y(t)}" r="5" class="f-dot"/>`).join("")}
+  </svg></figure>`;
+}
+function sinkPic(){
+  const parts = [[0,72,"1 SCRAPE","pre-rinse",""],[78,100,"2 WASH","detergent","≥110°F"],[184,100,"3 RINSE","clean water",""],[290,100,"4 SANITIZE","171°F · 30 s","or chemical"],[396,72,"5 AIR-DRY","no towels",""]];
+  return `<figure class="fig"><svg viewBox="0 0 468 170" role="img" aria-label="Three-compartment sink: scrape, wash, rinse, sanitize, air-dry">
+    ${parts.map(([px,w,a,b,c],k) => {
+      const basin = k>0 && k<4, mid = px+w/2;
+      return (basin ? `<rect x="${px}" y="30" width="${w}" height="80" rx="6" class="f-basin"/><rect x="${px+6}" y="58" width="${w-12}" height="46" rx="3" class="f-water"/>`
+                    : `<rect x="${px}" y="30" width="${w}" height="14" rx="3" class="f-board"/>`) +
+        `<text x="${mid}" y="${basin?132:66}" text-anchor="middle" class="s-step">${a}</text><text x="${mid}" y="${basin?148:82}" text-anchor="middle" class="s-sub">${b}</text>${c?`<text x="${mid}" y="${basin?163:97}" text-anchor="middle" class="s-sub">${c}</text>`:""}`;
+    }).join("")}
+  </svg></figure>`;
+}
+function coolerPic(){
+  return `<div class="shelves" style="margin-bottom:14px">${COOLER.map((c,s) => `<div class="shelf"><span class="n">${s===0?"TOP":s===4?"BOTTOM":"Shelf "+(s+1)}</span><div><b>${esc(c[0])}</b><small>${esc(c[1])} · ${esc(c[2].slice(0,2).join(", "))}</small></div></div>`).join("")}</div>`;
+}
+
+const EXTRA = {
+  micro:[
+    {at:1, key:"types", type:"sort", title:"Name that contaminant", prompt:"Is it biological, chemical or physical?", bins:["Biological","Chemical","Physical"], items:[
+      ["Metal shavings from a can opener",2,"Objects that end up in food are physical contaminants."],
+      ["Norovirus on a cook's hands",0,"Viruses are biological."],
+      ["Degreaser sprayed near the salad bar",1,"Cleaners are chemical contaminants."],
+      ["A bandage in the soup",2,"Bandages, jewelry and hair are physical."],
+      ["Histamine in temperature-abused tuna",0,"Toxins from bacteria or fish are biological."],
+      ["Sanitizer left on a cutting board",1,"Sanitizer residue is chemical."],
+      ["A fish bone in a fillet",2,"Natural objects like bones count as physical contaminants too."],
+      ["Salmonella in raw chicken",0,"Bacteria are biological."]]},
+    {at:5, key:"tcs", type:"sort", title:"TCS or not?", prompt:"Does this food need time and temperature control?", bins:["TCS","Not TCS"], items:[
+      ["Sliced cantaloupe",0,"Cut melon is TCS."],
+      ["A whole, uncut apple",1,"Whole, uncut produce isn't TCS."],
+      ["Cooked rice",0,"Cooked grains are TCS."],
+      ["Uncooked dry rice",1,"Dry, raw grains aren't TCS."],
+      ["Bean sprouts",0,"Sprouts are TCS."],
+      ["Saltine crackers",1,"Dry, shelf-stable food isn't TCS."],
+      ["Cut tomatoes",0,"Cut tomatoes are TCS."],
+      ["A baked potato",0,"Baked potatoes are TCS (a botulism risk if left out)."],
+      ["A loaf of bread",1,"Plain bread isn't TCS."],
+      ["Tofu",0,"Tofu and soy protein are TCS."]]}
+  ],
+  hands:[
+    {at:1, key:"wash", type:"order", title:"Wash up in order", prompt:"Tap the handwashing steps in the right order.", items:[
+      "Wet hands and arms with running water (at least 100°F)","Apply soap","Scrub hands and arms for 10–15 seconds","Rinse under running water","Dry with a single-use towel or hand dryer","Turn off the faucet using the towel"]},
+    {at:7, key:"sick", type:"sort", title:"Exclude, restrict or OK?", prompt:"A staff member reports this. What happens? (A regular restaurant, not a nursing home or hospital.)", bins:["Exclude","Restrict","OK to work"], items:[
+      ["Vomited this morning",0,"Vomiting means exclude from the operation."],
+      ["Had diarrhea last night",0,"Diarrhea means exclude until symptom-free for 24 hours."],
+      ["Yellow skin and eyes (jaundice)",0,"Exclude and report to the health department."],
+      ["Sore throat with a fever",1,"Restrict from food. Exclude if you serve a high-risk population."],
+      ["Diagnosed with Norovirus",0,"Any Big 6 diagnosis means exclude and report."],
+      ["Small cut on a finger, bandaged and gloved",2,"Covered with an impermeable bandage plus a glove, they can work."],
+      ["Had diarrhea, but symptom-free for 2 full days",2,"More than 24 hours symptom-free, so they can return."]]}
+  ],
+  dock:[
+    {at:3, key:"truck", type:"sort", title:"Accept or reject?", prompt:"The truck is here. Accept or reject each item?", bins:["Accept","Reject"], items:[
+      ["Raw chicken at 38°F",0,"Cold TCS food arrives at 41°F or lower."],
+      ["Frozen shrimp with large ice crystals",1,"Ice crystals mean it thawed and refroze."],
+      ["A can of beans with a swollen lid",1,"Swelling can mean bacterial growth, including botulism."],
+      ["Clean, unbroken eggs, truck air at 44°F",0,"Shell eggs need 45°F air temperature or lower."],
+      ["Hot soup from the commissary at 122°F",1,"Hot TCS food must arrive at 135°F or higher."],
+      ["Flour bags with gnaw holes",1,"Signs of pests mean reject."],
+      ["Fresh salmon at 46°F",1,"Fish is cold TCS food: 41°F or lower."],
+      ["Frozen fries, frozen solid, box intact",0,"Frozen food should arrive frozen solid."]]}
+  ],
+  walkin:[
+    {at:1, key:"rack", type:"pic", title:"See it in the walk-in", pic:coolerPic, body:"<p>Raw juices drip down. Put the food that gets cooked hottest at the bottom, so drips land on something that will be cooked hotter anyway.</p>"},
+    {at:1, key:"stack", type:"order", title:"Stock the shelves", prompt:"Tap each category from the top shelf to the bottom shelf.", items:[
+      "Ready-to-eat food","Seafood","Whole cuts of beef and pork","Ground meat and ground fish","Whole and ground poultry"]}
+  ],
+  line:[
+    {at:1, key:"thermo", type:"pic", title:"The temperature ladder", pic:thermoPic, body:"<p>Everything in the red band is the danger zone. Cooking temperatures sit above it; cold holding sits below it.</p>"},
+    {at:1, key:"temps", type:"match", title:"Match food to cook temp", prompt:"Tap a food, then its minimum internal temperature.", pairs:[
+      ["Chicken thigh","165°F"],["Hamburger patty","155°F"],["Salmon fillet","145°F"],["Pork chop","145°F"],["Broccoli for hot holding","135°F"],["Stuffed shells","165°F"],["Ground pork sausage","155°F"]]},
+    {at:2, key:"thaw", type:"sort", title:"Safe thaw or not?", prompt:"Is this a safe way to thaw?", bins:["Safe","Unsafe"], items:[
+      ["In the walk-in at 38°F",0,"Thawing in the cooler at 41°F or lower is safe."],
+      ["On the counter overnight",1,"The outside sits in the danger zone for hours."],
+      ["Under running water at 65°F",0,"Running drinkable water at 70°F or lower is safe."],
+      ["In a sink of standing warm water",1,"Warm, standing water puts food in the danger zone."],
+      ["In the microwave, then cooked right away",0,"Microwave thawing is fine if you cook it right after."],
+      ["In the microwave, then held until tomorrow",1,"Microwave-thawed food must be cooked immediately."],
+      ["A frozen burger straight onto the grill",0,"Thawing as part of cooking is safe."],
+      ["Under running water at 90°F",1,"The water must be 70°F or lower."]]}
+  ],
+  pass:[
+    {at:2, key:"cooling", type:"pic", title:"The cooling clock", pic:coolPic, body:"<p>The first 2 hours matter most because food passes through 125°F to 70°F, where bacteria grow fastest. Miss 70°F at 2 hours and you reheat and start over, or throw it out.</p>"},
+    {at:4, key:"check", type:"sort", title:"Safe or take action?", prompt:"You're doing a temperature check. Is this OK?", bins:["Safe","Take action"], items:[
+      ["Chili in the steam table at 141°F",0,"Hot holding is 135°F or higher."],
+      ["Potato salad on the buffet at 46°F",1,"Cold holding is 41°F or lower."],
+      ["Mac and cheese hot-held at 128°F",1,"Below 135°F. Tell your manager: it needs reheating or throwing out."],
+      ["Sliced melon on the salad bar at 39°F",0,"41°F or lower is safe."],
+      ["Stew cooling: 75°F after 2 hours",1,"It had to reach 70°F within 2 hours. Reheat to 165°F and restart, or throw it out."],
+      ["Rice cooling: 62°F after 2 hours",0,"Stage 1 met. It has 4 more hours to reach 41°F."],
+      ["Soup reheated for holding: 165°F after 90 minutes",0,"165°F within 2 hours is right."],
+      ["Gravy reheated for holding: 150°F",1,"Reheating for hot holding must reach 165°F for 15 seconds."]]}
+  ],
+  dish:[
+    {at:3, key:"steps", type:"order", title:"Five steps, in order", prompt:"Tap the steps for cleaning and sanitizing a surface.", items:["Scrape or remove food","Wash","Rinse","Sanitize","Air-dry"]},
+    {at:4, key:"sink", type:"pic", title:"The three-compartment sink", pic:sinkPic, body:"<p>Work left to right. Change the water when it gets dirty or the sanitizer tests low.</p>"}
+  ],
+  building:[
+    {at:3, key:"pests", type:"sort", title:"Roaches or rodents?", prompt:"Which pest left this sign?", bins:["Cockroaches","Rodents"], items:[
+      ["A strong, oily smell",0,"Cockroaches give off a strong oily odor."],
+      ["Droppings that look like black pepper",0,"Roach droppings look like pepper."],
+      ["Capsule-shaped egg cases",0,"Roaches leave capsule-shaped egg cases."],
+      ["Gnaw marks on packaging",1,"Rodents gnaw."],
+      ["Shredded paper nests",1,"Rodents build nests from soft material."],
+      ["Greasy rub marks along the walls",1,"Rodents leave tracks and rub marks along walls."]]},
+    {at:5, key:"hazard", type:"sort", title:"Stop service or keep going?", prompt:"Is this an imminent health hazard?", bins:["Stop service","Fix it, keep going"], items:[
+      ["Sewage backing up through a floor drain",0,"Sewage backup is an imminent health hazard."],
+      ["Power outage during dinner",0,"No power means no temperature control."],
+      ["No running water",0,"No water means no handwashing or dishwashing."],
+      ["Burned-out bulb in dry storage",1,"Replace it soon, but it doesn't stop service."],
+      ["Out of paper towels at a handwashing sink",1,"Restock it right away; it's a violation but not a reason to close."],
+      ["Kitchen floor flooding",0,"Flooding is an imminent health hazard."],
+      ["A cracked floor tile",1,"Schedule a repair."],
+      ["Rodents seen in the prep area",0,"A serious pest infestation is an imminent health hazard."]]}
+  ],
+  system:[
+    {at:2, key:"haccp", type:"order", title:"Line up the seven principles", prompt:"Tap the HACCP principles from 1 to 7.", items:[
+      "Conduct a hazard analysis","Determine critical control points","Establish critical limits","Establish monitoring procedures","Identify corrective actions","Verify that the system works","Establish record keeping"]},
+    {at:3, key:"terms", type:"match", title:"Match the HACCP terms", prompt:"Tap a term, then what it means.", pairs:[
+      ["Critical control point","A step where a hazard can be controlled"],["Critical limit","The number that must be met, like 165°F"],["Monitoring","Checking that the limit is being met"],
+      ["Corrective action","What you do when a limit isn't met"],["Verification","Confirming the plan actually works"],["Record keeping","Logs that prove it all happened"]]}
+  ]
+};
+Object.entries(EXTRA).forEach(([id, list]) => {
+  const c = CH.find(x => x.id===id);
+  list.map((x,n) => ({...x, n})).sort((a,b) => b.at-a.at || b.n-a.n).forEach(x => { x.id = id+":"+x.key; c.cards.splice(x.at, 0, x); });
+});
+
+/* ---------- State ---------- */
+const KEY = "dza-progress-v1";
+const fresh = () => ({v:1, track:"fh", xp:0, streak:{last:null,count:0}, badges:{}, missed:{}, cleared:0,
+  prog:{fh:{}, mgr:{}}, sq:{temp:0, cooler:0, allergen:0, bar:0}, drills:{}, updatedAt:0});
+function normalize(s){ const d=fresh(); if(!s||typeof s!=="object") return d;
+  return {...d, ...s, streak:{...d.streak,...(s.streak||{})}, prog:{fh:{...(s.prog&&s.prog.fh)}, mgr:{...(s.prog&&s.prog.mgr)}}, sq:{...d.sq,...(s.sq||{})}, badges:{...(s.badges||{})}, missed:{...(s.missed||{})}, drills:{...(s.drills||{})}}; }
+let S = fresh();
+try { const raw = localStorage.getItem(KEY); if (raw) S = normalize(JSON.parse(raw)); } catch(e) {}
+
+let remoteRef = null, writing = false, pending = false, pushTimer = null;
+function save(){
+  S.updatedAt = Date.now();
+  try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e) {}
+  if (remoteRef){ clearTimeout(pushTimer); pushTimer = setTimeout(pushRemote, 1200); }
+}
+async function pushRemote(){
+  if (!remoteRef) return;
+  if (writing){ pending = true; return; }
+  writing = true;
+  try { await remoteRef.set({state: JSON.parse(JSON.stringify(S))}); setSync(true); }
+  catch(e){ if (e && (e.code==="invalid_argument"||e.code==="revoked"||e.code==="not_granted")) { remoteRef=null; setSync(false); } }
+  writing = false;
+  if (pending){ pending = false; pushRemote(); }
+}
+function setSync(on){ const s=document.getElementById("sync"); s.classList.toggle("on", on); s.textContent = on ? "Progress synced to your Claude account" : "Saved on this device"; }
+async function connectRemote(){
+  try {
+    if (!window.claude || !window.claude.use) return false;
+    const [db, user] = await Promise.all([window.claude.use("db"), window.claude.use("user")]);
+    if (!db || !user) return true;
+    const id = await user.id(); if (!id) return true;
+    const ref = db.doc("data/users/" + id + "/progress");
+    const snap = await ref.get();
+    remoteRef = ref;
+    const rs = snap.exists && snap.data() && snap.data().state;
+    if (rs && (rs.updatedAt||0) > (S.updatedAt||0)) {
+      S = normalize(rs);
+      try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e) {}
+      renderHome(); setSync(true);
+    } else if (S.updatedAt > 0) { pushRemote(); }
+    else setSync(true);
+  } catch(e) {}
+  return true;
+}
+(function tryConnect(n){ connectRemote().then(ok => { if (!ok && n < 4) setTimeout(() => tryConnect(n+1), 800*(n+1)); }); })(0);
+
+/* ---------- Helpers ---------- */
+const $ = (s, r=document) => r.querySelector(s);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const shuffle = a => { a=[...a]; for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]];} return a; };
+const today = () => { const d=new Date(); return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); };
+const T = () => TRACKS[S.track];
+const isM = x => Array.isArray(x) ? x[2]==="m" : x.t==="m";
+const isDrill = x => !Array.isArray(x) && x.type!=="pic";
+const chaptersFor = t => CH.filter(c => !c.mgrOnly || t==="mgr");
+const poolFor = (c, t) => c.qs.map((q,i)=>({q, id:c.id+"-"+i})).filter(x => x.q[3]==="f" || t==="mgr");
+const QINDEX = {}; CH.forEach(c => c.qs.forEach((q,i) => QINDEX[c.id+"-"+i] = q));
+const star = on => `<svg viewBox="0 0 24 24" aria-hidden="true"><path class="${on?"on":"off"}" d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.4l-5.9 3.2 1.3-6.6L2.5 9.4l6.6-.8z"/></svg>`;
+const starsHtml = n => `<span class="stars" aria-label="${n} of 3 stars">${star(n>=1)}${star(n>=2)}${star(n>=3)}</span>`;
+function rankInfo(xp){ let i=0; RANKS.forEach((r,k)=>{ if(xp>=r[0]) i=k; }); const cur=RANKS[i], nxt=RANKS[i+1]; return {name:cur[1], next:nxt, pct: nxt ? (xp-cur[0])/(nxt[0]-cur[0])*100 : 100}; }
+function toast(text, tag){ const t=document.createElement("div"); t.className="toast"; t.innerHTML=(tag?`<span class="tag">${esc(tag)}</span>`:"")+`<span>${esc(text)}</span>`; $("#toasts").appendChild(t); setTimeout(()=>t.remove(), 3800); }
+function addXP(n){ if(n<=0) return; const before=rankInfo(S.xp).name; S.xp+=n; const after=rankInfo(S.xp).name; if(after!==before) toast("Promoted to "+after, "Rank up"); }
+function award(key){ if(S.badges[key]) return; S.badges[key]=Date.now(); const b=BADGES.find(x=>x[0]===key); if(b) toast(b[2], "Badge"); }
+function touchStreak(){ const d=today(); if(S.streak.last===d) return; const y=new Date(); y.setDate(y.getDate()-1);
+  const ys=y.getFullYear()+"-"+String(y.getMonth()+1).padStart(2,"0")+"-"+String(y.getDate()).padStart(2,"0");
+  S.streak.count = S.streak.last===ys ? S.streak.count+1 : 1; S.streak.last=d; if(S.streak.count>=3) award("streak"); }
+function totalStars(){ let n=0; ["fh","mgr"].forEach(t=>Object.values(S.prog[t]).forEach(r=>n+=r.stars||0)); return n; }
+function unlocked(t, idx){ const chs=chaptersFor(t); return idx===0 || !!(S.prog[t][chs[idx-1].id]||{}).passed; }
+function allPassed(t){ return chaptersFor(t).every(c => (S.prog[t][c.id]||{}).passed); }
+
+/* ---------- Home ---------- */
+function renderHome(){
+  ["fh","mgr"].forEach(k => $("#t-"+k).setAttribute("aria-pressed", String(S.track===k)));
+  const r = rankInfo(S.xp);
+  $("#rank").textContent = r.name;
+  $("#xpfill").style.width = Math.min(100, r.pct) + "%";
+  $("#s-xp").textContent = S.xp.toLocaleString();
+  $("#s-stars").textContent = totalStars();
+  $("#s-streak").textContent = S.streak.last && (S.streak.last===today() || isYesterday(S.streak.last)) ? S.streak.count : 0;
+  $("#xpnote").textContent = r.next ? `${(r.next[0]-S.xp).toLocaleString()} XP to ${r.next[1]}` : "Top rank reached";
+  $("#badgecount").textContent = Object.keys(S.badges).length + "/" + BADGES.length;
+  renderStations(); renderQuests(); renderBadges();
+}
+function isYesterday(s){ const y=new Date(); y.setDate(y.getDate()-1); return s===y.getFullYear()+"-"+String(y.getMonth()+1).padStart(2,"0")+"-"+String(y.getDate()).padStart(2,"0"); }
+
+function renderStations(){
+  const t=S.track, tr=TRACKS[t], chs=chaptersFor(t);
+  const passed = chs.filter(c => (S.prog[t][c.id]||{}).passed).length;
+  let h = `<div class="section-h" style="margin-top:0"><h2>${tr.name} line</h2><span class="note">${passed} of ${chs.length} stations passed · checks need ${tr.pass}% to pass</span></div><div class="grid">`;
+  chs.forEach((c, i) => {
+    const rec = S.prog[t][c.id] || {}, open = unlocked(t, i), qn = Math.min(tr.qPer, poolFor(c,t).length);
+    const nd = c.cards.filter(x => isDrill(x) && (!isM(x) || t==="mgr")).length;
+    const ndone = c.cards.filter(x => isDrill(x) && (!isM(x) || t==="mgr") && S.drills[x.id]).length;
+    const pill = rec.passed ? `<span class="pill ok">Passed</span>` : open ? `<span class="pill ready">Ready</span>` : `<span class="pill lock">Locked</span>`;
+    h += `<article class="ticket ${open?"":"locked"}">
+      <div class="thead"><span class="eyebrow">Station ${String(i+1).padStart(2,"0")}</span>${pill}</div>
+      <h3>${esc(c.name)}</h3><div class="area">${esc(c.area)}</div>
+      <p>${esc(c.blurb)}</p>
+      <div class="tfoot">
+        <button class="btn ghost" data-act="study" data-ch="${c.id}">Study${nd?` · ${ndone}/${nd} drills`:""}</button>
+        <button class="btn ${open?"go":""}" data-act="check" data-ch="${c.id}" ${open?"":"disabled"}>${rec.passed?"Retake":"Take"} check · ${qn}Q</button>
+        ${starsHtml(rec.stars||0)}${rec.best!=null?`<span class="best">best ${rec.best}%</span>`:""}
+      </div>
+      ${open?"":`<div class="note">Pass station ${String(i).padStart(2,"0")} to unlock the check. You can still study.</div>`}
+    </article>`;
+  });
+  const fin = S.prog[t].final || {}, fopen = allPassed(t);
+  const fq = Math.min(tr.finalN, chs.reduce((n,c)=>n+poolFor(c,t).length,0));
+  h += `<article class="ticket boss ${fopen?"":"locked"}">
+    <div class="thead"><span class="eyebrow">Final</span>${fin.passed?`<span class="pill ok">Passed</span>`:fopen?`<span class="pill hot">Boss</span>`:`<span class="pill lock">Locked</span>`}</div>
+    <h3>Health Inspection</h3><div class="area">Practice exam · every station</div>
+    <p>${fq} questions drawn from every station${tr.timer?`, with a ${tr.timer/60}-minute clock`:""}. Score 75% to pass, the same bar as the real exam.</p>
+    <div class="tfoot"><button class="btn ${fopen?"go":""}" data-act="final" ${fopen?"":"disabled"}>${fin.passed?"Retake":"Start"} inspection</button>${fin.best!=null?`<span class="best">best ${fin.best}%</span>`:""}</div>
+    ${fopen?"":`<div class="note">Unlocks when all ${chs.length} stations are passed.</div>`}
+  </article></div>`;
+  $("#pane-stations").innerHTML = h;
+}
+
+function renderQuests(){
+  const missN = Object.keys(S.missed).filter(id => QINDEX[id] && (QINDEX[id][3]==="f" || S.track==="mgr")).length;
+  const q = (id, title, area, body, best, btn, dis) => `<article class="ticket quest">
+    <div class="thead"><span class="eyebrow">${area}</span>${best}</div>
+    <h3>${title}</h3><p>${body}</p>
+    <div class="tfoot"><button class="btn go" data-act="${id}" ${dis?"disabled":""}>${btn}</button></div></article>`;
+  $("#pane-quests").innerHTML = `<div class="section-h" style="margin-top:0"><h2>Side quests</h2><span class="note">Short games for XP and badges. Open on both tracks.</span></div><div class="grid">
+    ${q("q-review","Weak Spots","Review",`Re-take the questions you've missed until they stick. ${missN?`<b>${missN}</b> waiting.`:"Nothing missed yet."}`, `<span class="pill ${missN?"hot":"ok"}">${missN} missed</span>`, "Review missed", !missN)}
+    ${q("q-temp","Temp Rush","60-second drill","Name the right temperature as fast as you can: cooking, holding, cooling, sanitizing.", `<span class="best">best ${S.sq.temp}</span>`, "Start the clock")}
+    ${q("q-allergen","Allergen Alert","Big 9 allergens","Read six dishes and tap every major allergen in each one.", `<span class="best">best ${S.sq.allergen}/6</span>`, "Check the tickets")}
+    ${q("q-cooler","Cooler Stack","Storage order","A delivery just landed. Stack each walk-in from top shelf to bottom.", `<span class="best">best ${S.sq.cooler}/5</span>`, "Stock the walk-in")}
+    ${q("q-bar","Bar Card","Alcohol service basics","Standard drinks, checking IDs and cutting guests off. Laws vary by state.", `<span class="best">best ${S.sq.bar}/${BAR.length}</span>`, "Start the quest")}
+  </div>`;
+}
+
+function renderBadges(){
+  $("#pane-badges").innerHTML = `<div class="section-h" style="margin-top:0"><h2>Badges</h2><span class="note">${Object.keys(S.badges).length} of ${BADGES.length} earned</span></div><div class="badges">` +
+    BADGES.map(b => `<div class="badge ${S.badges[b[0]]?"got":""}"><div class="medal">${b[1]}</div><div><b>${esc(b[2])}</b><span>${esc(b[3])}</span></div></div>`).join("") + `</div>`;
+}
+
+/* ---------- Navigation ---------- */
+let RUN = 0;
+function showPlay(on){ RUN++; $("#home").hidden = on; $("#play").hidden = !on; window.scrollTo(0,0); if(!on){ stopTimers(); renderHome(); } }
+let timers = [];
+function stopTimers(){ timers.forEach(clearInterval); timers=[]; }
+document.addEventListener("click", e => {
+  const b = e.target.closest("button"); if(!b) return;
+  if (b.dataset.track){ S.track=b.dataset.track; save(); renderHome(); return; }
+  if (b.dataset.tab){ ["stations","quests","badges"].forEach(t => { $("#tab-"+t).setAttribute("aria-selected", String(t===b.dataset.tab)); $("#pane-"+t).hidden = t!==b.dataset.tab; }); return; }
+  const a = b.dataset.act; if(!a) return;
+  if (a==="study") startStudy(CH.find(c=>c.id===b.dataset.ch), 0);
+  else if (a==="check") startStation(CH.find(c=>c.id===b.dataset.ch));
+  else if (a==="final") startFinal();
+  else if (a==="q-review") startReview();
+  else if (a==="q-temp") startTemp();
+  else if (a==="q-allergen") startAllergen();
+  else if (a==="q-cooler") startCooler();
+  else if (a==="q-bar") startBar();
+  else if (a==="home") showPlay(false);
+  else if (a==="quit"){ if (b.dataset.armed){ showPlay(false); } else { b.dataset.armed="1"; b.textContent="Tap again to leave (this run won't count)"; } }
+});
+$("#reset").addEventListener("click", e => {
+  const b=e.currentTarget;
+  if (b.dataset.armed){ const tr=S.track; S=fresh(); S.track=tr; save(); delete b.dataset.armed; b.textContent="Reset all progress"; renderHome(); toast("Progress reset"); }
+  else { b.dataset.armed="1"; b.textContent="Tap again to erase all progress"; setTimeout(()=>{ delete b.dataset.armed; b.textContent="Reset all progress"; }, 4000); }
+});
+const head = (title, extra="") => `<div class="play-head"><button class="link" data-act="quit">← Leave</button><span class="ttl">${esc(title)}</span>${extra}</div>`;
+
+/* ---------- Study ---------- */
+function startStudy(c, i){
+  const cards = c.cards.filter(x => !isM(x) || S.track==="mgr");
+  i = Math.max(0, Math.min(i, cards.length-1));
+  const cd = cards[i], open = unlocked(S.track, chaptersFor(S.track).indexOf(c)), arr = Array.isArray(cd), drill = isDrill(cd);
+  const tags = (isM(cd)?`<span class="pill hot mgrtag">Manager</span>`:"") +
+    (drill ? (S.drills[cd.id]?`<span class="pill ok mgrtag">Drill done</span>`:`<span class="pill ready mgrtag">Drill · +10 XP</span>`) : arr ? "" : `<span class="pill lock mgrtag">Picture</span>`);
+  const body = arr ? cd[1] : cd.type==="pic" ? cd.pic()+(cd.body||"") : `<p class="drillprompt">${esc(cd.prompt)}</p><div id="drill"></div>`;
+  $("#play").innerHTML = `<div class="play-head"><button class="link" data-act="home">← Stations</button><span class="ttl">${esc(c.name)} · study card ${i+1} of ${cards.length}</span></div>
+    <div class="card">${tags?`<div class="tags">${tags}</div>`:""}<h2>${esc(arr?cd[0]:cd.title)}</h2>${body}</div>
+    <div class="dots">${cards.map((_,k)=>`<i class="${k===i?"on":""}"></i>`).join("")}</div>
+    <div class="navrow">
+      <button class="btn ghost" id="sprev" ${i===0?"disabled":""}>Previous</button>
+      ${i<cards.length-1 ? `<button class="btn" id="snext">Next card</button>` : open ? `<button class="btn go" id="sgo">Take the check</button>` : `<button class="btn" data-act="home">Back to stations</button>`}
+    </div>`;
+  showPlay(true);
+  $("#sprev").onclick = () => startStudy(c, i-1);
+  const n=$("#snext"); if(n) n.onclick = () => startStudy(c, i+1);
+  const g=$("#sgo"); if(g) g.onclick = () => startStation(c);
+  if (drill) runDrill(cd, $("#drill"));
+}
+
+/* ---------- Study drills ---------- */
+function drillDone(d, perfect){
+  const prev = S.drills[d.id] || 0;
+  if (!prev){ addXP(10); toast("+10 XP", "Drill complete"); }
+  S.drills[d.id] = Math.max(prev, perfect?2:1);
+  if (Object.keys(S.drills).length >= 10) award("study");
+  touchStreak(); save();
+}
+function runDrill(d, host){
+  if (d.type==="order") drillOrder(d, host);
+  else if (d.type==="match") drillMatch(d, host);
+  else if (d.type==="sort") drillSort(d, host);
+}
+function drillOrder(d, host){
+  const deck = shuffle(d.items.map((t,k) => ({t,k}))); const placed = [];
+  const paint = checked => {
+    const ok = checked && placed.every((p,s) => p.k===s);
+    host.innerHTML = `<ol class="slots">${d.items.map((_,s) => { const p=placed[s], cls=checked?(p.k===s?"right":"wrong"):"";
+        return `<li class="slot ${cls}"><span class="n">${s+1}</span><span>${p?esc(p.t):`<span class="note">${s===placed.length?"Tap the next step":"&nbsp;"}</span>`}${checked&&p.k!==s?`<small>Should be: ${esc(d.items[s])}</small>`:""}</span></li>`; }).join("")}</ol>
+      ${checked?"":`<div class="pool">${deck.map((it,j) => `<button class="item" data-j="${j}" ${placed.includes(it)?"disabled":""}>${esc(it.t)}</button>`).join("")}</div>`}
+      <div class="drillbar">${checked ? `<span class="msg ${ok?"ok":"no"}">${ok?"All in order":"Some steps are out of order"}</span><button class="btn ghost" data-dr="retry">${ok?"Play again":"Try again"}</button>`
+        : `<button class="btn ghost" data-dr="undo" ${placed.length?"":"disabled"}>Undo</button>`}</div>`;
+    host.querySelectorAll(".item").forEach(b => b.onclick = () => {
+      placed.push(deck[+b.dataset.j]);
+      if (placed.length===d.items.length){ paint(true); if (placed.every((p,s) => p.k===s)) drillDone(d, true); } else paint(false);
+    });
+    const u = host.querySelector('[data-dr="undo"]'); if (u) u.onclick = () => { placed.pop(); paint(false); };
+    const r = host.querySelector('[data-dr="retry"]'); if (r) r.onclick = () => drillOrder(d, host);
+  };
+  paint(false);
+}
+function drillMatch(d, host){
+  const rights = shuffle(d.pairs.map((p,k) => ({t:p[1], k}))); const done = new Set(), used = new Set(); let sel = null, miss = 0;
+  const paint = () => {
+    const fin = done.size===d.pairs.length;
+    host.innerHTML = `<div class="match"><div class="col">${d.pairs.map((p,k) => `<button class="mbtn ${done.has(k)?"done":sel===k?"sel":""}" data-l="${k}" ${done.has(k)?"disabled":""}>${esc(p[0])}</button>`).join("")}</div>
+      <div class="col">${rights.map((r,j) => `<button class="mbtn ${used.has(j)?"done":""}" data-r="${j}" ${used.has(j)?"disabled":""}>${esc(r.t)}</button>`).join("")}</div></div>
+      <div class="drillbar">${fin ? `<span class="msg ${miss?"no":"ok"}">${miss?`All matched, with ${miss} wrong tap${miss>1?"s":""}`:"Perfect match"}</span><button class="btn ghost" data-dr="retry">Shuffle and replay</button>`
+        : `<span class="note">${sel==null?"Tap an item on the left, then its match on the right.":"Now tap its match on the right."}</span>`}</div>`;
+    host.querySelectorAll("[data-l]").forEach(b => b.onclick = () => { sel = +b.dataset.l; paint(); });
+    host.querySelectorAll("[data-r]").forEach(b => b.onclick = () => {
+      if (sel==null) return; const j = +b.dataset.r;
+      if (rights[j].t===d.pairs[sel][1]){ done.add(sel); used.add(j); sel=null; paint(); if (done.size===d.pairs.length) drillDone(d, miss===0); }
+      else { miss++; b.classList.add("bad"); setTimeout(() => b.classList.remove("bad"), 500); }
+    });
+    const r = host.querySelector('[data-dr="retry"]'); if (r) r.onclick = () => drillMatch(d, host);
+  };
+  paint();
+}
+function drillSort(d, host){
+  const items = shuffle(d.items); let i = 0, score = 0;
+  const paint = () => {
+    if (i>=items.length){
+      const ok = score/items.length >= 0.75;
+      host.innerHTML = `<div class="drillbar"><span class="msg ${ok?"ok":"no"}">${score} of ${items.length} sorted correctly${ok?"":". Get 75% to complete the drill."}</span><button class="btn ghost" data-dr="retry">Play again</button></div>`;
+      host.querySelector('[data-dr="retry"]').onclick = () => drillSort(d, host);
+      if (ok) drillDone(d, score===items.length);
+      return;
+    }
+    const [txt, bin, why] = items[i];
+    host.innerHTML = `<div class="qmeta"><span class="eyebrow">${i+1} of ${items.length}</span><span class="rushscore">${score} correct</span></div>
+      <div class="sortitem">${esc(txt)}</div>
+      <div class="bins">${d.bins.map((b,k) => `<button class="btn ghost bin" data-b="${k}">${esc(b)}</button>`).join("")}</div><div class="sfb"></div>`;
+    host.querySelectorAll(".bin").forEach(b => b.onclick = () => {
+      const k = +b.dataset.b, ok = k===bin; if (ok) score++;
+      host.querySelectorAll(".bin").forEach((x,j) => { x.disabled = true; if (j===bin) x.classList.add("right"); else if (j===k) x.classList.add("wrong"); });
+      host.querySelector(".sfb").innerHTML = `<div class="feedback" style="margin-top:12px"><div class="verdict ${ok?"ok":"no"}">${ok?"Correct":"It's "+esc(d.bins[bin])}</div><p>${esc(why)}</p><div class="row"><button class="btn" data-dr="next">${i===items.length-1?"Finish":"Next"}</button></div></div>`;
+      host.querySelector('[data-dr="next"]').onclick = () => { i++; paint(); };
+    });
+  };
+  paint();
+}
+
+/* ---------- Quiz engine ---------- */
+let Q = null;
+function makeItem(id, raw){ const order = shuffle([0,1,2,3]); return {id, q:raw[0], opts:order.map(k=>raw[1][k]), ans:order.indexOf(0), exp:raw[2]}; }
+function startQuiz(cfg){
+  Q = {...cfg, i:0, picks:[], combo:0, maxCombo:0};
+  if (cfg.timer){ Q.end = Date.now() + cfg.timer*1000; timers.push(setInterval(tick, 1000)); }
+  showPlay(true); renderQ();
+}
+function tick(){ if(!Q||!Q.end) return; const left=Math.max(0, Math.round((Q.end-Date.now())/1000)); const el=$("#qtimer");
+  if (el){ el.textContent = Math.floor(left/60)+":"+String(left%60).padStart(2,"0"); el.classList.toggle("low", left<300); }
+  if (left<=0){ stopTimers(); finishQuiz(); } }
+function renderQ(){
+  const it = Q.items[Q.i], n = Q.items.length;
+  $("#play").innerHTML = head(Q.title, Q.end?`<span class="timer" id="qtimer">--:--</span>`:"") +
+    `<div class="bar"><span style="width:${Q.i/n*100}%"></span></div>
+    <div class="qmeta"><span class="eyebrow">Question ${Q.i+1} of ${n}</span><span class="combo" ${Q.combo<2?"hidden":""}>Combo ×${Q.combo}</span></div>
+    <h2 class="qtext">${esc(it.q)}</h2>
+    <div class="opts">${it.opts.map((o,k)=>`<button class="opt" data-k="${k}"><span class="key">${"ABCD"[k]}</span><span>${esc(o)}</span></button>`).join("")}</div>
+    <div id="fb"></div>`;
+  if (Q.end) tick();
+  document.querySelectorAll(".opt").forEach(b => b.onclick = () => pick(+b.dataset.k));
+}
+function pick(k){
+  const it = Q.items[Q.i]; if (Q.picks[Q.i]!=null) return;
+  Q.picks[Q.i] = k; const ok = k===it.ans;
+  if (ok){ Q.combo++; Q.maxCombo=Math.max(Q.maxCombo,Q.combo); if (S.missed[it.id]){ delete S.missed[it.id]; S.cleared++; if(Q.kind==="review" && S.cleared>=5) award("review"); } }
+  else { Q.combo=0; if (QINDEX[it.id]) S.missed[it.id]=(S.missed[it.id]||0)+1; }
+  document.querySelectorAll(".opt").forEach((b,j) => { b.disabled=true; if(j===it.ans) b.classList.add("right"); else if(j===k) b.classList.add("wrong"); });
+  const c = $(".combo"); if (c){ c.hidden = Q.combo<2; c.textContent="Combo ×"+Q.combo; }
+  const last = Q.i===Q.items.length-1;
+  $("#fb").innerHTML = `<div class="feedback"><div class="verdict ${ok?"ok":"no"}">${ok?"Correct":"Not quite"}</div>${ok?"":`<p><b>Answer:</b> ${esc(it.opts[it.ans])}</p>`}<p>${esc(it.exp)}</p><div class="row"><button class="btn" id="qnext">${last?"See results":"Next question"}</button></div></div>`;
+  const nb=$("#qnext"); nb.focus(); nb.onclick = () => { if(last) finishQuiz(); else { Q.i++; renderQ(); } };
+}
+document.addEventListener("keydown", e => {
+  if ($("#play").hidden || !Q || !$(".opt")) return;
+  const k = "1234".indexOf(e.key) >= 0 ? "1234".indexOf(e.key) : "abcd".indexOf(e.key.toLowerCase());
+  if (k>=0 && k<Q.items[Q.i].opts.length && Q.picks[Q.i]==null) pick(k);
+});
+function finishQuiz(){
+  stopTimers();
+  const n=Q.items.length, correct=Q.items.filter((it,i)=>Q.picks[i]===it.ans).length, pct=Math.round(correct/n*100), passed=pct>=Q.pass;
+  touchStreak();
+  const extra = Q.onDone({correct, n, pct, passed, maxCombo:Q.maxCombo}) || {};
+  save();
+  const missed = Q.items.map((it,i)=>({it, p:Q.picks[i]})).filter(x => x.p!==x.it.ans);
+  $("#play").innerHTML = head(Q.title).replace('data-act="quit">← Leave','data-act="home">← Back') + `
+    <div class="result">
+      <div class="eyebrow">${correct} of ${n} correct · pass mark ${Q.pass}%</div>
+      <div class="stamp ${passed?"ok":"no"}">${passed?(Q.passWord||"Passed"):"Not yet"}</div>
+      <div class="bigscore">${pct}%</div>
+      ${extra.stars!=null?`<div style="margin-top:10px">${starsHtml(extra.stars)}</div>`:""}
+      <div class="rstats"><div><b>+${extra.xp||0}</b>XP earned</div><div><b>×${Q.maxCombo}</b>best combo</div>${extra.stat||""}</div>
+      <div class="btnrow">${extra.buttons||""}<button class="btn ghost" data-act="home">Back to stations</button></div>
+    </div>
+    ${missed.length?`<div class="misslist"><h3 style="font-size:24px">Review what you missed</h3>${missed.map(x=>`<div class="miss"><div class="q">${esc(x.it.q)}</div>${x.p!=null?`<div class="yours">You said: ${esc(x.it.opts[x.p])}</div>`:`<div class="yours">Not answered</div>`}<div class="ans">Answer: ${esc(x.it.opts[x.it.ans])}</div><p>${esc(x.it.exp)}</p></div>`).join("")}</div>`:""}`;
+  const r=$("#again"); if(r) r.onclick = extra.again;
+  const nx=$("#nextst"); if(nx) nx.onclick = extra.next;
+  Q = {...Q, items:[]};
+}
+
+/* ---------- Station / final / review / bar ---------- */
+function startStation(c){
+  const t=S.track, tr=TRACKS[t], pool=poolFor(c,t), chs=chaptersFor(t), idx=chs.indexOf(c);
+  if (!unlocked(t, idx)) return;
+  const items = shuffle(pool).slice(0, Math.min(tr.qPer, pool.length)).map(x => makeItem(x.id, x.q));
+  startQuiz({kind:"station", title:`${c.name} · ${tr.name} check`, items, pass:tr.pass, onDone: r => {
+    const rec = S.prog[t][c.id] || {best:0, stars:0, passed:false};
+    const stars = r.passed ? (r.pct===100?3:r.pct>=90?2:1) : 0;
+    const firstPass = r.passed && !rec.passed;
+    S.prog[t][c.id] = {best:Math.max(rec.best||0, r.pct), stars:Math.max(rec.stars||0, stars), passed:rec.passed||r.passed};
+    const xp = r.correct*tr.xp + r.maxCombo*2 + (r.passed?50:0) + (r.pct===100?50:0);
+    addXP(xp);
+    if (r.passed) award("first");
+    if (r.pct===100) award("perfect");
+    if (allPassed(t)) award("line_"+t);
+    const nextC = chs[idx+1];
+    if (firstPass) toast(nextC ? `${nextC.name} unlocked` : "Health Inspection unlocked", "Station cleared");
+    return {xp, stars, again:()=>startStation(c), next: nextC ? ()=>startStudy(nextC,0) : startFinal,
+      buttons:`<button class="btn ghost" id="again">Retake check</button>${r.passed?`<button class="btn go" id="nextst">${nextC?"Next station: "+esc(nextC.name):"Go to final inspection"}</button>`:""}`};
+  }});
+}
+function startFinal(){
+  const t=S.track, tr=TRACKS[t]; if(!allPassed(t)) return;
+  const pool = chaptersFor(t).flatMap(c => poolFor(c,t));
+  const items = shuffle(pool).slice(0, Math.min(tr.finalN, pool.length)).map(x => makeItem(x.id, x.q));
+  startQuiz({kind:"final", title:`Health Inspection · ${tr.name}`, items, pass:75, timer:tr.timer, passWord:"Inspection passed", onDone: r => {
+    const rec = S.prog[t].final || {};
+    S.prog[t].final = {best:Math.max(rec.best||0, r.pct), passed:rec.passed||r.passed};
+    const xp = r.correct*tr.xp + (r.passed?200:0); addXP(xp);
+    if (r.passed) award("final_"+t);
+    return {xp, again:startFinal, buttons:`<button class="btn ghost" id="again">Take another practice exam</button>`};
+  }});
+}
+function startReview(){
+  const ids = shuffle(Object.keys(S.missed).filter(id => QINDEX[id] && (QINDEX[id][3]==="f" || S.track==="mgr"))).slice(0,10);
+  if (!ids.length) return;
+  startQuiz({kind:"review", title:"Weak Spots review", items: ids.map(id => makeItem(id, QINDEX[id])), pass:75, passWord:"Fixed", onDone: r => {
+    const xp = r.correct*5; addXP(xp);
+    const left = Object.keys(S.missed).length;
+    return {xp, stat:`<div><b>${left}</b>still missed</div>`, again:startReview, buttons: left?`<button class="btn ghost" id="again">Review again</button>`:""};
+  }});
+}
+function startBar(){
+  const items = shuffle(BAR).map((q,i) => makeItem("bar-"+i, q));
+  startQuiz({kind:"bar", title:"Bar Card", items, pass:75, passWord:"Carded", onDone: r => {
+    S.sq.bar = Math.max(S.sq.bar, r.correct);
+    const xp = r.correct*8; addXP(xp); if (r.passed) award("bar");
+    return {xp, again:startBar, buttons:`<button class="btn ghost" id="again">Play again</button>`};
+  }});
+}
+
+/* ---------- Mini-game results ---------- */
+function miniResult(title, scoreText, ok, stamp, xp, note, again){
+  touchStreak(); save();
+  $("#play").innerHTML = `<div class="play-head"><button class="link" data-act="home">← Back</button><span class="ttl">${esc(title)}</span></div>
+    <div class="result"><div class="stamp ${ok?"ok":"no"}">${esc(stamp)}</div><div class="bigscore">${scoreText}</div>
+    <div class="rstats"><div><b>+${xp}</b>XP earned</div>${note}</div>
+    <div class="btnrow"><button class="btn go" id="again">Play again</button><button class="btn ghost" data-act="home">Back to stations</button></div></div>`;
+  $("#again").onclick = again;
+}
+
+/* ---------- Temp Rush ---------- */
+function startTemp(){
+  const R = {score:0, miss:0, end:Date.now()+60000, deck:shuffle(TEMPS), k:0, lock:false};
+  showPlay(true); const run = RUN;
+  const draw = () => {
+    if (run !== RUN) return;
+    if (R.k>=R.deck.length){ R.deck=shuffle(TEMPS); R.k=0; }
+    const [label, ans] = R.deck[R.k++];
+    const others = shuffle(TEMP_CHOICES.filter(x=>x!==ans).sort((a,b)=>Math.abs(a-ans)-Math.abs(b-ans)).slice(0,5)).slice(0,3);
+    const opts = shuffle([ans, ...others]);
+    $("#play").innerHTML = head("Temp Rush", `<span class="timer" id="rt">60</span>`) +
+      `<div class="qmeta"><span class="rushscore">${R.score} correct</span><span class="eyebrow">Name the temperature</span></div>
+      <div class="rushprompt">${esc(label)}</div>
+      <div class="temps">${opts.map(o=>`<button class="tbtn" data-v="${o}">${o}°F</button>`).join("")}</div>
+      <div class="flash" id="rf"></div>`;
+    upd();
+    document.querySelectorAll(".tbtn").forEach(b => b.onclick = () => {
+      if (R.lock) return; R.lock=true; const v=+b.dataset.v, ok=v===ans;
+      b.classList.add(ok?"right":"wrong");
+      if (!ok){ document.querySelector(`.tbtn[data-v="${ans}"]`).classList.add("right"); R.miss++; }
+      else R.score++;
+      const f=$("#rf"); f.className="flash "+(ok?"ok":"no"); f.textContent = ok ? "Correct" : `${label}: ${ans}°F`;
+      setTimeout(()=>{ R.lock=false; if(Date.now()<R.end) draw(); }, ok?380:1100);
+    });
+  };
+  const upd = () => { const left=Math.max(0, Math.ceil((R.end-Date.now())/1000)); const el=$("#rt"); if(el){ el.textContent=left+"s"; el.classList.toggle("low", left<=10);} if(left<=0) finish(); };
+  const finish = () => {
+    stopTimers();
+    const best = R.score > S.sq.temp; S.sq.temp=Math.max(S.sq.temp,R.score);
+    const xp = R.score*3; addXP(xp); if (R.score>=12) award("temp");
+    miniResult("Temp Rush", String(R.score), R.score>=12, best?"New best":"Time", xp, `<div><b>${R.miss}</b>missed</div><div><b>${S.sq.temp}</b>best</div>`, startTemp);
+  };
+  timers.push(setInterval(upd, 250));
+  draw();
+}
+
+/* ---------- Allergen Alert ---------- */
+function startAllergen(){
+  const dishes = shuffle(DISHES).slice(0,6); let i=0, score=0;
+  showPlay(true);
+  const draw = () => {
+    const [name, ing, ans] = dishes[i]; const sel = new Set();
+    $("#play").innerHTML = head("Allergen Alert") + `<div class="bar"><span style="width:${i/6*100}%"></span></div>
+      <div class="qmeta"><span class="eyebrow">Ticket ${i+1} of 6</span><span class="rushscore">${score} correct</span></div>
+      <div class="dish"><div class="eyebrow">Tap every major allergen</div><h2>${esc(name)}</h2><div class="ing">${esc(ing)}</div></div>
+      <div class="chips">${BIG9.map(a=>`<button class="chip" aria-pressed="false" data-a="${esc(a)}">${esc(a)}</button>`).join("")}</div>
+      <div id="afb" style="margin-top:16px"><button class="btn" id="asub">${"Submit"}</button> <span class="note">Submit with nothing selected if there are none.</span></div>`;
+    document.querySelectorAll(".chip").forEach(c => c.onclick = () => { if(c.disabled) return; const a=c.dataset.a; sel.has(a)?sel.delete(a):sel.add(a); c.setAttribute("aria-pressed", String(sel.has(a))); });
+    $("#asub").onclick = () => {
+      const ok = ans.length===sel.size && ans.every(a=>sel.has(a)); if(ok) score++;
+      document.querySelectorAll(".chip").forEach(c => { const a=c.dataset.a; c.disabled=true; c.setAttribute("aria-pressed","false");
+        if (ans.includes(a)) c.classList.add(sel.has(a)?"right":"missed"); else if (sel.has(a)) c.classList.add("wrong"); });
+      const last = i===5;
+      $("#afb").innerHTML = `<div class="feedback"><div class="verdict ${ok?"ok":"no"}">${ok?"All caught":"Check the ticket again"}</div>
+        <p>${ans.length?`Allergens: <b>${esc(ans.join(", "))}</b>.`:"None of the Big 9 are in this dish."} Solid green = you caught it, dashed = you missed it, red = not in this dish.</p>
+        <div class="row"><button class="btn" id="anext">${last?"See results":"Next ticket"}</button></div></div>`;
+      $("#anext").onclick = () => { if(last) finish(); else { i++; draw(); } };
+    };
+  };
+  const finish = () => {
+    S.sq.allergen=Math.max(S.sq.allergen,score); const xp=score*10; addXP(xp); if(score===6) award("allergen");
+    miniResult("Allergen Alert", score+"/6", score>=5, score===6?"Allergen ace":score>=5?"Close":"Keep practicing", xp, `<div><b>${S.sq.allergen}/6</b>best</div>`, startAllergen);
+  };
+  draw();
+}
+
+/* ---------- Cooler Stack ---------- */
+function startCooler(){
+  let round=0, score=0;
+  showPlay(true);
+  const draw = () => {
+    const items = COOLER.map((c,k) => ({cat:k, name:c[2][Math.floor(Math.random()*c[2].length)]}));
+    const deck = shuffle(items); const placed = [];
+    const paint = (checked) => {
+      $("#play").innerHTML = head("Cooler Stack") + `<div class="bar"><span style="width:${round/5*100}%"></span></div>
+        <div class="qmeta"><span class="eyebrow">Walk-in ${round+1} of 5</span><span class="rushscore">${score} correct</span></div>
+        <p class="note" style="margin-top:0">Tap items in order, top shelf first.</p>
+        <div class="cooler">
+          <div class="shelves">${[0,1,2,3,4].map(s => { const p=placed[s]; const cls = checked&&p ? (p.cat===s?"right":"wrong") : "";
+            return `<div class="shelf ${cls}"><span class="n">${s===0?"TOP":s===4?"BOTTOM":"Shelf "+(s+1)}</span><div>${p?`<b>${esc(p.name)}</b>`:`<span class="note">empty</span>`}${checked?`<small>Belongs here: ${esc(COOLER[s][0])} (${esc(COOLER[s][1])})</small>`:""}</div></div>`; }).join("")}</div>
+          <div class="items">${deck.map((it,k)=>`<button class="item" data-k="${k}" ${placed.includes(it)||checked?"disabled":""}>${esc(it.name)}</button>`).join("")}
+            ${checked?"":`<button class="btn ghost" id="cundo" ${placed.length?"":"disabled"}>Undo</button>`}</div>
+        </div><div id="cfb" style="margin-top:16px"></div>`;
+      document.querySelectorAll(".item").forEach(b => b.onclick = () => { placed.push(deck[+b.dataset.k]); if(placed.length===5) check(); else paint(false); });
+      const u=$("#cundo"); if(u) u.onclick = () => { placed.pop(); paint(false); };
+    };
+    const check = () => {
+      const ok = placed.every((p,s)=>p.cat===s); if(ok) score++;
+      paint(true); const last = round===4;
+      $("#cfb").innerHTML = `<div class="feedback"><div class="verdict ${ok?"ok":"no"}">${ok?"Stacked right":"Shelf order is off"}</div>
+        <p>Top to bottom: ready-to-eat, seafood, whole cuts, ground meat, poultry. Food that needs the hottest cooking goes lowest.</p>
+        <div class="row"><button class="btn" id="cnext">${last?"See results":"Next walk-in"}</button></div></div>`;
+      $("#cnext").onclick = () => { if(last) finish(); else { round++; draw(); } };
+    };
+    paint(false);
+  };
+  const finish = () => {
+    S.sq.cooler=Math.max(S.sq.cooler,score); const xp=score*10; addXP(xp); if(score===5) award("cooler");
+    miniResult("Cooler Stack", score+"/5", score>=4, score===5?"Shelf boss":score>=4?"Close":"Restock", xp, `<div><b>${S.sq.cooler}/5</b>best</div>`, startCooler);
+  };
+  draw();
+}
+
+renderHome();
+</script>
+</body>
+</html>
