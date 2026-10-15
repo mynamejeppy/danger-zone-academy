@@ -1,6 +1,6 @@
 // Offline support. The page itself is fetched network-first so updates show up right away;
 // everything else (icons, fonts) is served from cache first.
-const CACHE = "dza-v1";
+const CACHE = "dza-v2";
 const CORE = ["./", "./index.html", "./manifest.webmanifest", "./icons/icon-192.png", "./icons/icon-512.png", "./icons/apple-touch-icon.png"];
 
 self.addEventListener("install", e => {

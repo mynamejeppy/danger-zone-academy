@@ -187,6 +187,15 @@ nav.tabs .count{font-family:var(--f-mono);font-size:12px;background:var(--surfac
 .flash{text-align:center;font-weight:700;min-height:1.6em;margin-top:12px}
 .flash.ok{color:var(--accent)} .flash.no{color:var(--hot)}
 
+/* Language and read-aloud */
+.langrow{display:flex;gap:8px;align-items:center;justify-content:flex-end}
+#lang{font:inherit;font-weight:700;border:1.5px solid var(--line);border-radius:8px;padding:6px 8px;background:var(--surface);color:var(--ink);min-height:36px}
+.en{display:block;font-size:14px;font-weight:400;color:var(--muted);margin-top:4px}
+.qtext .en{font-size:16px}
+.speak{margin-left:auto;display:inline-flex;align-items:center;gap:6px;border:1.5px solid var(--line);background:var(--surface);border-radius:20px;padding:6px 12px;font-size:14px;font-weight:700;min-height:36px}
+.speak svg{width:16px;height:16px;fill:currentColor}
+#langnote{color:var(--hot);font-weight:700}
+
 /* Study pictures */
 .tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
 .tags .mgrtag{margin:0}
@@ -255,33 +264,35 @@ footer .rowf{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;
   <div id="home">
     <header class="top">
       <div class="brand">
-        <div class="eyebrow">Food safety training · 41°F to 135°F</div>
+        <div class="eyebrow" data-i18n>Food safety training · 41°F to 135°F</div>
         <h1>Danger <span class="zone">Zone</span> Academy</h1>
-        <p>Work through each kitchen station, pass its check, and unlock the final inspection.</p>
+        <p data-i18n>Work through each kitchen station, pass its check, and unlock the final inspection.</p>
       </div>
       <div class="trackpick">
-        <span class="eyebrow">Difficulty</span>
+        <span class="eyebrow" data-i18n>Difficulty</span>
         <div class="seg" role="group" aria-label="Choose track">
-          <button id="t-fh" data-track="fh"><small>Easy</small>Food Handler</button>
-          <button id="t-mgr" data-track="mgr"><small>Hard</small>Manager</button>
+          <button id="t-fh" data-track="fh"><small data-i18n>Easy</small><span data-i18n>Food Handler</span></button>
+          <button id="t-mgr" data-track="mgr"><small data-i18n>Hard</small><span data-i18n>Manager</span></button>
         </div>
+        <div class="langrow"><label class="eyebrow" for="lang" data-i18n>Language</label>
+          <select id="lang"><option value="en">English</option><option value="es">Español</option><option value="zh">中文</option></select></div>
       </div>
     </header>
     <div class="gauge">
       <div class="rank" id="rank">Dish Pit Rookie</div>
       <div class="probe" aria-hidden="true"><span class="bulb"></span><span class="stem"><span class="fill" id="xpfill"></span></span></div>
       <div class="gstats">
-        <div class="gstat"><b id="s-xp">0</b><span>XP</span></div>
-        <div class="gstat"><b id="s-stars">0</b><span>stars</span></div>
-        <div class="gstat"><b id="s-streak">0</b><span>day streak</span></div>
+        <div class="gstat"><b id="s-xp">0</b><span data-i18n>XP</span></div>
+        <div class="gstat"><b id="s-stars">0</b><span data-i18n>stars</span></div>
+        <div class="gstat"><b id="s-streak">0</b><span data-i18n>day streak</span></div>
       </div>
       <div class="gnote" id="xpnote"></div>
     </div>
 
     <nav class="tabs" role="tablist">
-      <button role="tab" id="tab-stations" data-tab="stations" aria-selected="true">Stations</button>
-      <button role="tab" id="tab-quests" data-tab="quests" aria-selected="false">Side quests</button>
-      <button role="tab" id="tab-badges" data-tab="badges" aria-selected="false">Badges <span class="count" id="badgecount">0</span></button>
+      <button role="tab" id="tab-stations" data-tab="stations" aria-selected="true"><span data-i18n>Stations</span></button>
+      <button role="tab" id="tab-quests" data-tab="quests" aria-selected="false"><span data-i18n>Side quests</span></button>
+      <button role="tab" id="tab-badges" data-tab="badges" aria-selected="false"><span data-i18n>Badges</span> <span class="count" id="badgecount">0</span></button>
     </nav>
 
     <section id="pane-stations"></section>
@@ -296,6 +307,7 @@ footer .rowf{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;
       <span class="sync" id="sync">Saved on this device</span>
       <button class="link" id="reset">Reset all progress</button>
     </div>
+    <div id="langnote" hidden></div>
     <div>Independent study aid. Not affiliated with or endorsed by ServSafe or the National Restaurant Association. Content follows the <a href="https://www.fda.gov/food/fda-food-code/food-code-2022" target="_blank" rel="noopener">FDA Food Code</a>; your state or local health department may have different rules. Book the real exam at <a href="https://www.servsafe.com" target="_blank" rel="noopener">servsafe.com</a>.</div>
   </footer>
 </div>
@@ -778,7 +790,7 @@ Object.entries(EXTRA).forEach(([id, list]) => {
 /* ---------- State ---------- */
 const KEY = "dza-progress-v1";
 const fresh = () => ({v:1, track:"fh", xp:0, streak:{last:null,count:0}, badges:{}, missed:{}, cleared:0,
-  prog:{fh:{}, mgr:{}}, sq:{temp:0, cooler:0, allergen:0, bar:0}, drills:{}, updatedAt:0});
+  prog:{fh:{}, mgr:{}}, sq:{temp:0, cooler:0, allergen:0, bar:0}, drills:{}, lang:"en", updatedAt:0});
 function normalize(s){ const d=fresh(); if(!s||typeof s!=="object") return d;
   return {...d, ...s, streak:{...d.streak,...(s.streak||{})}, prog:{fh:{...(s.prog&&s.prog.fh)}, mgr:{...(s.prog&&s.prog.mgr)}}, sq:{...d.sq,...(s.sq||{})}, badges:{...(s.badges||{})}, missed:{...(s.missed||{})}, drills:{...(s.drills||{})}}; }
 let S = fresh();
@@ -847,51 +859,20 @@ function allPassed(t){ return chaptersFor(t).every(c => (S.prog[t][c.id]||{}).pa
 
 /* ---------- Home ---------- */
 function renderHome(){
+  applyStatic();
   ["fh","mgr"].forEach(k => $("#t-"+k).setAttribute("aria-pressed", String(S.track===k)));
   const r = rankInfo(S.xp);
-  $("#rank").textContent = r.name;
+  $("#rank").textContent = loc(r.name);
   $("#xpfill").style.width = Math.min(100, r.pct) + "%";
   $("#s-xp").textContent = S.xp.toLocaleString();
   $("#s-stars").textContent = totalStars();
   $("#s-streak").textContent = S.streak.last && (S.streak.last===today() || isYesterday(S.streak.last)) ? S.streak.count : 0;
-  $("#xpnote").textContent = r.next ? `${(r.next[0]-S.xp).toLocaleString()} XP to ${r.next[1]}` : "Top rank reached";
+  $("#xpnote").textContent = r.next ? loc("{0} XP to {1}", (r.next[0]-S.xp).toLocaleString(), loc(r.next[1])) : loc("Top rank reached");
   $("#badgecount").textContent = Object.keys(S.badges).length + "/" + BADGES.length;
   renderStations(); renderQuests(); renderBadges();
 }
 function isYesterday(s){ const y=new Date(); y.setDate(y.getDate()-1); return s===y.getFullYear()+"-"+String(y.getMonth()+1).padStart(2,"0")+"-"+String(y.getDate()).padStart(2,"0"); }
 
-function renderStations(){
-  const t=S.track, tr=TRACKS[t], chs=chaptersFor(t);
-  const passed = chs.filter(c => (S.prog[t][c.id]||{}).passed).length;
-  let h = `<div class="section-h" style="margin-top:0"><h2>${tr.name} line</h2><span class="note">${passed} of ${chs.length} stations passed · checks need ${tr.pass}% to pass</span></div><div class="grid">`;
-  chs.forEach((c, i) => {
-    const rec = S.prog[t][c.id] || {}, open = unlocked(t, i), qn = Math.min(tr.qPer, poolFor(c,t).length);
-    const nd = c.cards.filter(x => isDrill(x) && (!isM(x) || t==="mgr")).length;
-    const ndone = c.cards.filter(x => isDrill(x) && (!isM(x) || t==="mgr") && S.drills[x.id]).length;
-    const pill = rec.passed ? `<span class="pill ok">Passed</span>` : open ? `<span class="pill ready">Ready</span>` : `<span class="pill lock">Locked</span>`;
-    h += `<article class="ticket ${open?"":"locked"}">
-      <div class="thead"><span class="eyebrow">Station ${String(i+1).padStart(2,"0")}</span>${pill}</div>
-      <h3>${esc(c.name)}</h3><div class="area">${esc(c.area)}</div>
-      <p>${esc(c.blurb)}</p>
-      <div class="tfoot">
-        <button class="btn ghost" data-act="study" data-ch="${c.id}">Study${nd?` · ${ndone}/${nd} drills`:""}</button>
-        <button class="btn ${open?"go":""}" data-act="check" data-ch="${c.id}" ${open?"":"disabled"}>${rec.passed?"Retake":"Take"} check · ${qn}Q</button>
-        ${starsHtml(rec.stars||0)}${rec.best!=null?`<span class="best">best ${rec.best}%</span>`:""}
-      </div>
-      ${open?"":`<div class="note">Pass station ${String(i).padStart(2,"0")} to unlock the check. You can still study.</div>`}
-    </article>`;
-  });
-  const fin = S.prog[t].final || {}, fopen = allPassed(t);
-  const fq = Math.min(tr.finalN, chs.reduce((n,c)=>n+poolFor(c,t).length,0));
-  h += `<article class="ticket boss ${fopen?"":"locked"}">
-    <div class="thead"><span class="eyebrow">Final</span>${fin.passed?`<span class="pill ok">Passed</span>`:fopen?`<span class="pill hot">Boss</span>`:`<span class="pill lock">Locked</span>`}</div>
-    <h3>Health Inspection</h3><div class="area">Practice exam · every station</div>
-    <p>${fq} questions drawn from every station${tr.timer?`, with a ${tr.timer/60}-minute clock`:""}. Score 75% to pass, the same bar as the real exam.</p>
-    <div class="tfoot"><button class="btn ${fopen?"go":""}" data-act="final" ${fopen?"":"disabled"}>${fin.passed?"Retake":"Start"} inspection</button>${fin.best!=null?`<span class="best">best ${fin.best}%</span>`:""}</div>
-    ${fopen?"":`<div class="note">Unlocks when all ${chs.length} stations are passed.</div>`}
-  </article></div>`;
-  $("#pane-stations").innerHTML = h;
-}
 
 function renderQuests(){
   const missN = Object.keys(S.missed).filter(id => QINDEX[id] && (QINDEX[id][3]==="f" || S.track==="mgr")).length;
@@ -915,7 +896,7 @@ function renderBadges(){
 
 /* ---------- Navigation ---------- */
 let RUN = 0;
-function showPlay(on){ RUN++; $("#home").hidden = on; $("#play").hidden = !on; window.scrollTo(0,0); if(!on){ stopTimers(); renderHome(); } }
+function showPlay(on){ RUN++; if (canSpeak) speechSynthesis.cancel(); $("#home").hidden = on; $("#play").hidden = !on; window.scrollTo(0,0); if(!on){ stopTimers(); renderHome(); } }
 let timers = [];
 function stopTimers(){ timers.forEach(clearInterval); timers=[]; }
 document.addEventListener("click", e => {
@@ -932,36 +913,16 @@ document.addEventListener("click", e => {
   else if (a==="q-cooler") startCooler();
   else if (a==="q-bar") startBar();
   else if (a==="home") showPlay(false);
-  else if (a==="quit"){ if (b.dataset.armed){ showPlay(false); } else { b.dataset.armed="1"; b.textContent="Tap again to leave (this run won't count)"; } }
+  else if (a==="speak") speakSel(b.dataset.say);
+  else if (a==="quit"){ if (b.dataset.armed){ showPlay(false); } else { b.dataset.armed="1"; b.textContent=loc("Tap again to leave (this run won't count)"); } }
 });
 $("#reset").addEventListener("click", e => {
   const b=e.currentTarget;
   if (b.dataset.armed){ const tr=S.track; S=fresh(); S.track=tr; save(); delete b.dataset.armed; b.textContent="Reset all progress"; renderHome(); toast("Progress reset"); }
   else { b.dataset.armed="1"; b.textContent="Tap again to erase all progress"; setTimeout(()=>{ delete b.dataset.armed; b.textContent="Reset all progress"; }, 4000); }
 });
-const head = (title, extra="") => `<div class="play-head"><button class="link" data-act="quit">← Leave</button><span class="ttl">${esc(title)}</span>${extra}</div>`;
 
 /* ---------- Study ---------- */
-function startStudy(c, i){
-  const cards = c.cards.filter(x => !isM(x) || S.track==="mgr");
-  i = Math.max(0, Math.min(i, cards.length-1));
-  const cd = cards[i], open = unlocked(S.track, chaptersFor(S.track).indexOf(c)), arr = Array.isArray(cd), drill = isDrill(cd);
-  const tags = (isM(cd)?`<span class="pill hot mgrtag">Manager</span>`:"") +
-    (drill ? (S.drills[cd.id]?`<span class="pill ok mgrtag">Drill done</span>`:`<span class="pill ready mgrtag">Drill · +10 XP</span>`) : arr ? "" : `<span class="pill lock mgrtag">Picture</span>`);
-  const body = arr ? cd[1] : cd.type==="pic" ? cd.pic()+(cd.body||"") : `<p class="drillprompt">${esc(cd.prompt)}</p><div id="drill"></div>`;
-  $("#play").innerHTML = `<div class="play-head"><button class="link" data-act="home">← Stations</button><span class="ttl">${esc(c.name)} · study card ${i+1} of ${cards.length}</span></div>
-    <div class="card">${tags?`<div class="tags">${tags}</div>`:""}<h2>${esc(arr?cd[0]:cd.title)}</h2>${body}</div>
-    <div class="dots">${cards.map((_,k)=>`<i class="${k===i?"on":""}"></i>`).join("")}</div>
-    <div class="navrow">
-      <button class="btn ghost" id="sprev" ${i===0?"disabled":""}>Previous</button>
-      ${i<cards.length-1 ? `<button class="btn" id="snext">Next card</button>` : open ? `<button class="btn go" id="sgo">Take the check</button>` : `<button class="btn" data-act="home">Back to stations</button>`}
-    </div>`;
-  showPlay(true);
-  $("#sprev").onclick = () => startStudy(c, i-1);
-  const n=$("#snext"); if(n) n.onclick = () => startStudy(c, i+1);
-  const g=$("#sgo"); if(g) g.onclick = () => startStation(c);
-  if (drill) runDrill(cd, $("#drill"));
-}
 
 /* ---------- Study drills ---------- */
 function drillDone(d, perfect){
@@ -976,159 +937,19 @@ function runDrill(d, host){
   else if (d.type==="match") drillMatch(d, host);
   else if (d.type==="sort") drillSort(d, host);
 }
-function drillOrder(d, host){
-  const deck = shuffle(d.items.map((t,k) => ({t,k}))); const placed = [];
-  const paint = checked => {
-    const ok = checked && placed.every((p,s) => p.k===s);
-    host.innerHTML = `<ol class="slots">${d.items.map((_,s) => { const p=placed[s], cls=checked?(p.k===s?"right":"wrong"):"";
-        return `<li class="slot ${cls}"><span class="n">${s+1}</span><span>${p?esc(p.t):`<span class="note">${s===placed.length?"Tap the next step":"&nbsp;"}</span>`}${checked&&p.k!==s?`<small>Should be: ${esc(d.items[s])}</small>`:""}</span></li>`; }).join("")}</ol>
-      ${checked?"":`<div class="pool">${deck.map((it,j) => `<button class="item" data-j="${j}" ${placed.includes(it)?"disabled":""}>${esc(it.t)}</button>`).join("")}</div>`}
-      <div class="drillbar">${checked ? `<span class="msg ${ok?"ok":"no"}">${ok?"All in order":"Some steps are out of order"}</span><button class="btn ghost" data-dr="retry">${ok?"Play again":"Try again"}</button>`
-        : `<button class="btn ghost" data-dr="undo" ${placed.length?"":"disabled"}>Undo</button>`}</div>`;
-    host.querySelectorAll(".item").forEach(b => b.onclick = () => {
-      placed.push(deck[+b.dataset.j]);
-      if (placed.length===d.items.length){ paint(true); if (placed.every((p,s) => p.k===s)) drillDone(d, true); } else paint(false);
-    });
-    const u = host.querySelector('[data-dr="undo"]'); if (u) u.onclick = () => { placed.pop(); paint(false); };
-    const r = host.querySelector('[data-dr="retry"]'); if (r) r.onclick = () => drillOrder(d, host);
-  };
-  paint(false);
-}
-function drillMatch(d, host){
-  const rights = shuffle(d.pairs.map((p,k) => ({t:p[1], k}))); const done = new Set(), used = new Set(); let sel = null, miss = 0;
-  const paint = () => {
-    const fin = done.size===d.pairs.length;
-    host.innerHTML = `<div class="match"><div class="col">${d.pairs.map((p,k) => `<button class="mbtn ${done.has(k)?"done":sel===k?"sel":""}" data-l="${k}" ${done.has(k)?"disabled":""}>${esc(p[0])}</button>`).join("")}</div>
-      <div class="col">${rights.map((r,j) => `<button class="mbtn ${used.has(j)?"done":""}" data-r="${j}" ${used.has(j)?"disabled":""}>${esc(r.t)}</button>`).join("")}</div></div>
-      <div class="drillbar">${fin ? `<span class="msg ${miss?"no":"ok"}">${miss?`All matched, with ${miss} wrong tap${miss>1?"s":""}`:"Perfect match"}</span><button class="btn ghost" data-dr="retry">Shuffle and replay</button>`
-        : `<span class="note">${sel==null?"Tap an item on the left, then its match on the right.":"Now tap its match on the right."}</span>`}</div>`;
-    host.querySelectorAll("[data-l]").forEach(b => b.onclick = () => { sel = +b.dataset.l; paint(); });
-    host.querySelectorAll("[data-r]").forEach(b => b.onclick = () => {
-      if (sel==null) return; const j = +b.dataset.r;
-      if (rights[j].t===d.pairs[sel][1]){ done.add(sel); used.add(j); sel=null; paint(); if (done.size===d.pairs.length) drillDone(d, miss===0); }
-      else { miss++; b.classList.add("bad"); setTimeout(() => b.classList.remove("bad"), 500); }
-    });
-    const r = host.querySelector('[data-dr="retry"]'); if (r) r.onclick = () => drillMatch(d, host);
-  };
-  paint();
-}
-function drillSort(d, host){
-  const items = shuffle(d.items); let i = 0, score = 0;
-  const paint = () => {
-    if (i>=items.length){
-      const ok = score/items.length >= 0.75;
-      host.innerHTML = `<div class="drillbar"><span class="msg ${ok?"ok":"no"}">${score} of ${items.length} sorted correctly${ok?"":". Get 75% to complete the drill."}</span><button class="btn ghost" data-dr="retry">Play again</button></div>`;
-      host.querySelector('[data-dr="retry"]').onclick = () => drillSort(d, host);
-      if (ok) drillDone(d, score===items.length);
-      return;
-    }
-    const [txt, bin, why] = items[i];
-    host.innerHTML = `<div class="qmeta"><span class="eyebrow">${i+1} of ${items.length}</span><span class="rushscore">${score} correct</span></div>
-      <div class="sortitem">${esc(txt)}</div>
-      <div class="bins">${d.bins.map((b,k) => `<button class="btn ghost bin" data-b="${k}">${esc(b)}</button>`).join("")}</div><div class="sfb"></div>`;
-    host.querySelectorAll(".bin").forEach(b => b.onclick = () => {
-      const k = +b.dataset.b, ok = k===bin; if (ok) score++;
-      host.querySelectorAll(".bin").forEach((x,j) => { x.disabled = true; if (j===bin) x.classList.add("right"); else if (j===k) x.classList.add("wrong"); });
-      host.querySelector(".sfb").innerHTML = `<div class="feedback" style="margin-top:12px"><div class="verdict ${ok?"ok":"no"}">${ok?"Correct":"It's "+esc(d.bins[bin])}</div><p>${esc(why)}</p><div class="row"><button class="btn" data-dr="next">${i===items.length-1?"Finish":"Next"}</button></div></div>`;
-      host.querySelector('[data-dr="next"]').onclick = () => { i++; paint(); };
-    });
-  };
-  paint();
-}
 
 /* ---------- Quiz engine ---------- */
 let Q = null;
-function makeItem(id, raw){ const order = shuffle([0,1,2,3]); return {id, q:raw[0], opts:order.map(k=>raw[1][k]), ans:order.indexOf(0), exp:raw[2]}; }
-function startQuiz(cfg){
-  Q = {...cfg, i:0, picks:[], combo:0, maxCombo:0};
-  if (cfg.timer){ Q.end = Date.now() + cfg.timer*1000; timers.push(setInterval(tick, 1000)); }
-  showPlay(true); renderQ();
-}
 function tick(){ if(!Q||!Q.end) return; const left=Math.max(0, Math.round((Q.end-Date.now())/1000)); const el=$("#qtimer");
   if (el){ el.textContent = Math.floor(left/60)+":"+String(left%60).padStart(2,"0"); el.classList.toggle("low", left<300); }
   if (left<=0){ stopTimers(); finishQuiz(); } }
-function renderQ(){
-  const it = Q.items[Q.i], n = Q.items.length;
-  $("#play").innerHTML = head(Q.title, Q.end?`<span class="timer" id="qtimer">--:--</span>`:"") +
-    `<div class="bar"><span style="width:${Q.i/n*100}%"></span></div>
-    <div class="qmeta"><span class="eyebrow">Question ${Q.i+1} of ${n}</span><span class="combo" ${Q.combo<2?"hidden":""}>Combo ×${Q.combo}</span></div>
-    <h2 class="qtext">${esc(it.q)}</h2>
-    <div class="opts">${it.opts.map((o,k)=>`<button class="opt" data-k="${k}"><span class="key">${"ABCD"[k]}</span><span>${esc(o)}</span></button>`).join("")}</div>
-    <div id="fb"></div>`;
-  if (Q.end) tick();
-  document.querySelectorAll(".opt").forEach(b => b.onclick = () => pick(+b.dataset.k));
-}
-function pick(k){
-  const it = Q.items[Q.i]; if (Q.picks[Q.i]!=null) return;
-  Q.picks[Q.i] = k; const ok = k===it.ans;
-  if (ok){ Q.combo++; Q.maxCombo=Math.max(Q.maxCombo,Q.combo); if (S.missed[it.id]){ delete S.missed[it.id]; S.cleared++; if(Q.kind==="review" && S.cleared>=5) award("review"); } }
-  else { Q.combo=0; if (QINDEX[it.id]) S.missed[it.id]=(S.missed[it.id]||0)+1; }
-  document.querySelectorAll(".opt").forEach((b,j) => { b.disabled=true; if(j===it.ans) b.classList.add("right"); else if(j===k) b.classList.add("wrong"); });
-  const c = $(".combo"); if (c){ c.hidden = Q.combo<2; c.textContent="Combo ×"+Q.combo; }
-  const last = Q.i===Q.items.length-1;
-  $("#fb").innerHTML = `<div class="feedback"><div class="verdict ${ok?"ok":"no"}">${ok?"Correct":"Not quite"}</div>${ok?"":`<p><b>Answer:</b> ${esc(it.opts[it.ans])}</p>`}<p>${esc(it.exp)}</p><div class="row"><button class="btn" id="qnext">${last?"See results":"Next question"}</button></div></div>`;
-  const nb=$("#qnext"); nb.focus(); nb.onclick = () => { if(last) finishQuiz(); else { Q.i++; renderQ(); } };
-}
 document.addEventListener("keydown", e => {
   if ($("#play").hidden || !Q || !$(".opt")) return;
   const k = "1234".indexOf(e.key) >= 0 ? "1234".indexOf(e.key) : "abcd".indexOf(e.key.toLowerCase());
   if (k>=0 && k<Q.items[Q.i].opts.length && Q.picks[Q.i]==null) pick(k);
 });
-function finishQuiz(){
-  stopTimers();
-  const n=Q.items.length, correct=Q.items.filter((it,i)=>Q.picks[i]===it.ans).length, pct=Math.round(correct/n*100), passed=pct>=Q.pass;
-  touchStreak();
-  const extra = Q.onDone({correct, n, pct, passed, maxCombo:Q.maxCombo}) || {};
-  save();
-  const missed = Q.items.map((it,i)=>({it, p:Q.picks[i]})).filter(x => x.p!==x.it.ans);
-  $("#play").innerHTML = head(Q.title).replace('data-act="quit">← Leave','data-act="home">← Back') + `
-    <div class="result">
-      <div class="eyebrow">${correct} of ${n} correct · pass mark ${Q.pass}%</div>
-      <div class="stamp ${passed?"ok":"no"}">${passed?(Q.passWord||"Passed"):"Not yet"}</div>
-      <div class="bigscore">${pct}%</div>
-      ${extra.stars!=null?`<div style="margin-top:10px">${starsHtml(extra.stars)}</div>`:""}
-      <div class="rstats"><div><b>+${extra.xp||0}</b>XP earned</div><div><b>×${Q.maxCombo}</b>best combo</div>${extra.stat||""}</div>
-      <div class="btnrow">${extra.buttons||""}<button class="btn ghost" data-act="home">Back to stations</button></div>
-    </div>
-    ${missed.length?`<div class="misslist"><h3 style="font-size:24px">Review what you missed</h3>${missed.map(x=>`<div class="miss"><div class="q">${esc(x.it.q)}</div>${x.p!=null?`<div class="yours">You said: ${esc(x.it.opts[x.p])}</div>`:`<div class="yours">Not answered</div>`}<div class="ans">Answer: ${esc(x.it.opts[x.it.ans])}</div><p>${esc(x.it.exp)}</p></div>`).join("")}</div>`:""}`;
-  const r=$("#again"); if(r) r.onclick = extra.again;
-  const nx=$("#nextst"); if(nx) nx.onclick = extra.next;
-  Q = {...Q, items:[]};
-}
 
 /* ---------- Station / final / review / bar ---------- */
-function startStation(c){
-  const t=S.track, tr=TRACKS[t], pool=poolFor(c,t), chs=chaptersFor(t), idx=chs.indexOf(c);
-  if (!unlocked(t, idx)) return;
-  const items = shuffle(pool).slice(0, Math.min(tr.qPer, pool.length)).map(x => makeItem(x.id, x.q));
-  startQuiz({kind:"station", title:`${c.name} · ${tr.name} check`, items, pass:tr.pass, onDone: r => {
-    const rec = S.prog[t][c.id] || {best:0, stars:0, passed:false};
-    const stars = r.passed ? (r.pct===100?3:r.pct>=90?2:1) : 0;
-    const firstPass = r.passed && !rec.passed;
-    S.prog[t][c.id] = {best:Math.max(rec.best||0, r.pct), stars:Math.max(rec.stars||0, stars), passed:rec.passed||r.passed};
-    const xp = r.correct*tr.xp + r.maxCombo*2 + (r.passed?50:0) + (r.pct===100?50:0);
-    addXP(xp);
-    if (r.passed) award("first");
-    if (r.pct===100) award("perfect");
-    if (allPassed(t)) award("line_"+t);
-    const nextC = chs[idx+1];
-    if (firstPass) toast(nextC ? `${nextC.name} unlocked` : "Health Inspection unlocked", "Station cleared");
-    return {xp, stars, again:()=>startStation(c), next: nextC ? ()=>startStudy(nextC,0) : startFinal,
-      buttons:`<button class="btn ghost" id="again">Retake check</button>${r.passed?`<button class="btn go" id="nextst">${nextC?"Next station: "+esc(nextC.name):"Go to final inspection"}</button>`:""}`};
-  }});
-}
-function startFinal(){
-  const t=S.track, tr=TRACKS[t]; if(!allPassed(t)) return;
-  const pool = chaptersFor(t).flatMap(c => poolFor(c,t));
-  const items = shuffle(pool).slice(0, Math.min(tr.finalN, pool.length)).map(x => makeItem(x.id, x.q));
-  startQuiz({kind:"final", title:`Health Inspection · ${tr.name}`, items, pass:75, timer:tr.timer, passWord:"Inspection passed", onDone: r => {
-    const rec = S.prog[t].final || {};
-    S.prog[t].final = {best:Math.max(rec.best||0, r.pct), passed:rec.passed||r.passed};
-    const xp = r.correct*tr.xp + (r.passed?200:0); addXP(xp);
-    if (r.passed) award("final_"+t);
-    return {xp, again:startFinal, buttons:`<button class="btn ghost" id="again">Take another practice exam</button>`};
-  }});
-}
 function startReview(){
   const ids = shuffle(Object.keys(S.missed).filter(id => QINDEX[id] && (QINDEX[id][3]==="f" || S.track==="mgr"))).slice(0,10);
   if (!ids.length) return;
@@ -1258,6 +1079,393 @@ function startCooler(){
     miniResult("Cooler Stack", score+"/5", score>=4, score===5?"Shelf boss":score>=4?"Close":"Restock", xp, `<div><b>${S.sq.cooler}/5</b>best</div>`, startCooler);
   };
   draw();
+}
+
+/* ---------- Language: interface text ---------- */
+const UI = {
+es: {
+  "Food safety training · 41°F to 135°F":"Capacitación en inocuidad alimentaria · 41°F a 135°F",
+  "Work through each kitchen station, pass its check, and unlock the final inspection.":"Avance por cada estación de la cocina, apruebe su prueba y desbloquee la inspección final.",
+  "Difficulty":"Dificultad","Language":"Idioma","Easy":"Fácil","Hard":"Difícil","Food Handler":"Manipulador de alimentos","Manager":"Gerente",
+  "XP":"XP","stars":"estrellas","day streak":"días seguidos","Stations":"Estaciones","Side quests":"Misiones extra","Badges":"Insignias",
+  "Dish Pit Rookie":"Novato del lavaplatos","Prep Cook":"Cocinero de preparación","Line Cook":"Cocinero de línea","Sous Chef":"Sous chef","Chef de Cuisine":"Chef de cocina","Executive Chef":"Chef ejecutivo",
+  "{0} XP to {1}":"{0} XP para {1}","Top rank reached":"Rango máximo alcanzado",
+  "{0} of {1} stations passed · checks need {2}% to pass":"{0} de {1} estaciones aprobadas · se necesita {2}% para aprobar",
+  "Passed":"Aprobado","Ready":"Lista","Locked":"Bloqueada","Station {0}":"Estación {0}","Study":"Estudiar","{0}/{1} drills":"{0}/{1} ejercicios",
+  "Retake check · {0}Q":"Repetir prueba · {0} P","Take check · {0}Q":"Hacer prueba · {0} P","best {0}%":"mejor {0}%",
+  "Pass station {0} to unlock the check. You can still study.":"Apruebe la estación {0} para desbloquear la prueba. Puede estudiar de todos modos.",
+  "Final":"Final","Boss":"Jefe final","Health Inspection":"Inspección sanitaria","Practice exam · every station":"Examen de práctica · todas las estaciones",
+  "{0} questions drawn from every station.":"{0} preguntas de todas las estaciones.","{0}-minute clock.":"Reloj de {0} minutos.",
+  "Score 75% to pass, the same bar as the real exam.":"Necesita 75% para aprobar, igual que en el examen real.",
+  "Retake inspection":"Repetir inspección","Start inspection":"Empezar inspección","Unlocks when all {0} stations are passed.":"Se desbloquea al aprobar las {0} estaciones.",
+  "← Stations":"← Estaciones","card {0} of {1}":"tarjeta {0} de {1}","Drill done":"Ejercicio hecho","Drill · +10 XP":"Ejercicio · +10 XP","Picture":"Imagen",
+  "Previous":"Anterior","Next card":"Siguiente","Take the check":"Hacer la prueba","Back to stations":"Volver a estaciones","Read aloud":"Leer en voz alta",
+  "← Leave":"← Salir","← Back":"← Volver","Question {0} of {1}":"Pregunta {0} de {1}","Combo ×{0}":"Racha ×{0}","Show English":"Ver en inglés","Hide English":"Ocultar inglés",
+  "Correct":"Correcto","Not quite":"No exactamente","Answer:":"Respuesta:","See results":"Ver resultados","Next question":"Siguiente pregunta",
+  "{0} of {1} correct · pass mark {2}%":"{0} de {1} correctas · se aprueba con {2}%","Inspection passed":"Inspección aprobada","Not yet":"Todavía no",
+  "XP earned":"XP ganados","best combo":"mejor racha","Review what you missed":"Repase lo que falló","You said:":"Usted respondió:","Not answered":"Sin responder",
+  "{0} unlocked":"{0} desbloqueada","Health Inspection unlocked":"Inspección sanitaria desbloqueada","Station cleared":"Estación superada","Retake check":"Repetir prueba",
+  "Next station: {0}":"Siguiente estación: {0}","Go to final inspection":"Ir a la inspección final","Take another practice exam":"Hacer otro examen de práctica",
+  "Tap again to leave (this run won't count)":"Toque otra vez para salir (este intento no cuenta)",
+  "Tap the next step":"Toque el siguiente paso","Should be:":"Debe ser:","All in order":"Todo en orden","Some steps are out of order":"Algunos pasos están fuera de orden",
+  "Play again":"Jugar otra vez","Try again":"Intentar otra vez","Undo":"Deshacer","All matched, with {0} wrong taps":"Todo emparejado, con {0} errores","Perfect match":"Emparejamiento perfecto",
+  "Shuffle and replay":"Mezclar y repetir","Tap an item on the left, then its match on the right.":"Toque un elemento a la izquierda y luego su pareja a la derecha.",
+  "Now tap its match on the right.":"Ahora toque su pareja a la derecha.","{0} of {1} sorted correctly":"{0} de {1} clasificados correctamente",
+  "Get 75% to complete the drill.":"Necesita 75% para completar el ejercicio.","{0} of {1}":"{0} de {1}","{0} correct":"{0} correctas","It's {0}":"Es {0}","Finish":"Terminar","Next":"Siguiente",
+  "LANGNOTE":"Traducción en borrador, aún sin revisión. Por ahora solo la Estación 1 está traducida; el resto aparece en inglés."
+},
+zh: {
+  "Food safety training · 41°F to 135°F":"食品安全培训 · 41°F 至 135°F",
+  "Work through each kitchen station, pass its check, and unlock the final inspection.":"逐一通过厨房各站的测验，解锁最终卫生检查。",
+  "Difficulty":"难度","Language":"语言","Easy":"简单","Hard":"困难","Food Handler":"食品从业人员","Manager":"经理",
+  "XP":"经验值","stars":"星","day streak":"连续天数","Stations":"站点","Side quests":"支线任务","Badges":"徽章",
+  "Dish Pit Rookie":"洗碗新手","Prep Cook":"备菜厨师","Line Cook":"灶台厨师","Sous Chef":"副主厨","Chef de Cuisine":"厨师长","Executive Chef":"行政总厨",
+  "{0} XP to {1}":"还差 {0} 经验值升为{1}","Top rank reached":"已达最高等级",
+  "{0} of {1} stations passed · checks need {2}% to pass":"已通过 {0}/{1} 站 · 测验需达到 {2}% 才算通过",
+  "Passed":"已通过","Ready":"可挑战","Locked":"未解锁","Station {0}":"第 {0} 站","Study":"学习","{0}/{1} drills":"练习 {0}/{1}",
+  "Retake check · {0}Q":"重新测验 · {0} 题","Take check · {0}Q":"开始测验 · {0} 题","best {0}%":"最佳 {0}%",
+  "Pass station {0} to unlock the check. You can still study.":"通过第 {0} 站后解锁测验。现在仍可学习。",
+  "Final":"终极关卡","Boss":"Boss","Health Inspection":"卫生检查","Practice exam · every station":"模拟考试 · 涵盖所有站点",
+  "{0} questions drawn from every station.":"从所有站点抽取 {0} 道题。","{0}-minute clock.":"限时 {0} 分钟。",
+  "Score 75% to pass, the same bar as the real exam.":"达到 75% 即通过，与正式考试标准相同。",
+  "Retake inspection":"重新检查","Start inspection":"开始检查","Unlocks when all {0} stations are passed.":"通过全部 {0} 站后解锁。",
+  "← Stations":"← 站点","card {0} of {1}":"第 {0}/{1} 张卡片","Drill done":"练习已完成","Drill · +10 XP":"练习 · +10 经验值","Picture":"图解",
+  "Previous":"上一张","Next card":"下一张","Take the check":"开始测验","Back to stations":"返回站点","Read aloud":"朗读",
+  "← Leave":"← 离开","← Back":"← 返回","Question {0} of {1}":"第 {0}/{1} 题","Combo ×{0}":"连击 ×{0}","Show English":"显示英文","Hide English":"隐藏英文",
+  "Correct":"正确","Not quite":"不太对","Answer:":"答案：","See results":"查看结果","Next question":"下一题",
+  "{0} of {1} correct · pass mark {2}%":"答对 {0}/{1} 题 · 及格线 {2}%","Inspection passed":"检查通过","Not yet":"还差一点",
+  "XP earned":"获得经验值","best combo":"最高连击","Review what you missed":"复习答错的题","You said:":"你的答案：","Not answered":"未作答",
+  "{0} unlocked":"已解锁：{0}","Health Inspection unlocked":"卫生检查已解锁","Station cleared":"本站通过","Retake check":"重新测验",
+  "Next station: {0}":"下一站：{0}","Go to final inspection":"前往最终检查","Take another practice exam":"再做一次模拟考试",
+  "Tap again to leave (this run won't count)":"再点一次离开（本次不计分）",
+  "Tap the next step":"点选下一步","Should be:":"应为：","All in order":"顺序全对","Some steps are out of order":"有些步骤顺序不对",
+  "Play again":"再玩一次","Try again":"再试一次","Undo":"撤销","All matched, with {0} wrong taps":"全部配对完成，点错 {0} 次","Perfect match":"完美配对",
+  "Shuffle and replay":"打乱重玩","Tap an item on the left, then its match on the right.":"先点左边的项目，再点右边对应的答案。",
+  "Now tap its match on the right.":"现在点右边对应的答案。","{0} of {1} sorted correctly":"分类正确 {0}/{1}",
+  "Get 75% to complete the drill.":"达到 75% 即完成练习。","{0} of {1}":"{0}/{1}","{0} correct":"答对 {0}","It's {0}":"应为：{0}","Finish":"完成","Next":"下一个",
+  "LANGNOTE":"翻译为初稿，尚未审核。目前只翻译了第 1 站，其余内容仍为英文。"
+}};
+
+/* ---------- Language: lesson content (Station 1 so far) ---------- */
+const TX = {
+es: {
+  ch: { micro: { name:"Caos Microbiano", area:"Contaminación y enfermedades transmitidas por alimentos",
+    blurb:"Los tres tipos de contaminantes, FAT TOM, los 6 patógenos principales y qué alimentos necesitan control de tiempo y temperatura." } },
+  cards: {
+    "Three kinds of contamination":["Tres tipos de contaminación","<ul><li><b>Biológica:</b> bacterias, virus, parásitos, hongos y sus toxinas.</li><li><b>Química:</b> limpiadores, desinfectantes, pulidores, pesticidas.</li><li><b>Física:</b> virutas de metal, vidrio, huesos, grapas, joyas, vendajes.</li></ul>"],
+    "FAT TOM":["FAT TOM","<p>Lo que necesitan las bacterias para crecer (siglas en inglés):</p><ul><li><b>F</b>ood: alimento (sobre todo proteína)</li><li><b>A</b>cidity: acidez, pH de 4.6 a 7.5</li><li><b>T</b>emperature: la zona de peligro, <span class='temp'>41°F–135°F</span></li><li><b>T</b>ime: tiempo; 4 horas o más en la zona de peligro significa desecharlo</li><li><b>O</b>xygen: oxígeno (algunas lo necesitan, otras no)</li><li><b>M</b>oisture: humedad, actividad de agua de 0.85 o más</li></ul><p>El tiempo y la temperatura son los dos que usted controla directamente.</p>"],
+    "The Big 6":["Los 6 principales","<p>Muy contagiosos y graves incluso en cantidades pequeñas:</p><ul><li>Norovirus</li><li>Hepatitis A</li><li>Shigella spp.</li><li>Salmonella Typhi</li><li>Salmonella no tifoidea</li><li>E. coli productora de toxina Shiga (STEC)</li></ul>"],
+    "Viruses vs. bacteria":["Virus vs. bacterias","<p>Los virus (norovirus, hepatitis A) no crecen en los alimentos y la cocción normal no los elimina de forma confiable. Se transmiten de las personas, así que <b>lavarse las manos y mantener en casa al personal enfermo</b> son las principales defensas.</p><p>Las bacterias crecen en los alimentos dentro de la zona de peligro. Controle el tiempo y la temperatura.</p>"],
+    "TCS food":["Alimentos TCS","<p>Alimentos que necesitan control de tiempo y temperatura:</p><ul><li>Leche y lácteos; huevos con cáscara; carne; aves; pescado; mariscos</li><li>Papas horneadas; arroz, frijoles y verduras cocidos</li><li>Tofu y proteína de soya; germinados</li><li>Melón rebanado, tomates cortados, hojas verdes cortadas</li><li>Ajo en aceite sin tratar</li></ul>"],
+    "High-risk populations":["Poblaciones de alto riesgo","<ul><li>Personas mayores</li><li>Niños en edad preescolar</li><li>Personas con el sistema inmunitario debilitado (tratamiento de cáncer, trasplantes, VIH)</li></ul><p>Se enferman más y más rápido. Muchas reglas son más estrictas cuando usted les sirve.</p>"],
+    "Pathogens by food":["Patógenos según el alimento","<ul><li><b>Bacillus cereus:</b> arroz cocido mantenido a temperatura incorrecta</li><li><b>Clostridium perfringens:</b> carnes, guisos y salsas enfriados demasiado lento</li><li><b>Clostridium botulinum:</b> ajo en aceite, enlatado mal hecho, empaque con oxígeno reducido</li><li><b>Listeria:</b> carnes frías, lácteos sin pasteurizar; crece en el refrigerador</li><li><b>Vibrio:</b> ostiones crudos de aguas cálidas</li></ul>"],
+    "Seafood toxins":["Toxinas de pescados y mariscos","<p>La cocción y la congelación <b>no</b> las destruyen. Compre a proveedores aprobados.</p><ul><li><b>Histamina (escombroide):</b> atún, macarela y dorado (mahi-mahi) con abuso de tiempo y temperatura. Enrojecimiento, sudor, ardor en la boca.</li><li><b>Ciguatoxina:</b> peces de arrecife como barracuda, mero, pargo y medregal. Sensaciones de frío y calor invertidas.</li></ul>"]
+  },
+  qs: {
+    "micro-0":["¿Cuál es la zona de peligro de temperatura?",["41°F a 135°F","0°F a 32°F","135°F a 165°F","32°F a 70°F"],"Las bacterias crecen rápido entre 41°F y 135°F. Mantenga fríos los alimentos fríos y calientes los calientes."],
+    "micro-1":["Las bacterias crecen mejor en alimentos que son:",["Neutros o ligeramente ácidos","Muy ácidos, como el jugo de limón","Muy secos, como las galletas saladas","Congelados"],"La mayoría de los patógenos crecen mejor con un pH de 4.6 a 7.5."],
+    "micro-2":["¿Cuál es un contaminante físico?",["Virutas de metal de un abrelatas","Desinfectante en una mesa de preparación","Norovirus","Histamina en el atún"],"Los contaminantes físicos son objetos: metal, vidrio, huesos, joyas, vendajes."],
+    "micro-3":["¿Qué patógeno es uno de los 6 principales?",["Hepatitis A","Bacillus cereus","Clostridium perfringens","Listeria monocytogenes"],"Los 6 principales son norovirus, hepatitis A, Shigella, Salmonella Typhi, Salmonella no tifoidea y E. coli STEC."],
+    "micro-4":["¿Qué alimento necesita control de tiempo y temperatura (TCS)?",["Melón rebanado","Una manzana entera sin cortar","Arroz seco sin cocinar","Una barra de pan"],"Al cortar un melón se expone la pulpa húmeda donde crecen bacterias. El melón rebanado, los tomates cortados y las hojas verdes cortadas son TCS."],
+    "micro-5":["¿Cuál es la mejor forma de evitar que el norovirus se propague en una cocina?",["Lavarse bien las manos y mantener alejado al personal enfermo","Cocinar todo a 135°F","Guardar los alimentos en el congelador","Mantener los alimentos tapados"],"El norovirus viene de las personas y la cocción no lo elimina de forma confiable. Lavarse las manos y excluir al personal enfermo son los controles clave."],
+    "micro-6":["Un cocinero rocía limpiavidrios junto a una barra de ensaladas abierta. ¿Qué tipo de contaminación es?",["Química","Física","Biológica","Contacto cruzado"],"Los limpiadores, desinfectantes y pulidores son contaminantes químicos. Úselos lejos de los alimentos."],
+    "micro-7":["¿Qué grupo es una población de alto riesgo?",["Niños en edad preescolar","Adolescentes","Adultos sanos de 18 a 40 años","Atletas universitarios"],"Los niños en edad preescolar, las personas mayores y las personas con el sistema inmunitario debilitado tienen mayor riesgo."],
+    "micro-8":["De las seis condiciones de FAT TOM, ¿cuáles dos puede controlar más directamente un manipulador de alimentos?",["Tiempo y temperatura","Oxígeno y humedad","Alimento y acidez","Acidez y oxígeno"],"Limite el tiempo en la zona de peligro y mantenga los alimentos a temperaturas seguras."],
+    "micro-9":["Un atún que se dejó fuera demasiado tiempo hace que los clientes se enrojezcan y suden. ¿Cocinarlo lo habría evitado?",["No. La histamina no se destruye al cocinar ni al congelar","Sí, si se cocina a 145°F","Sí, si se cocina a 165°F","Sí, si se congela primero"],"La histamina (escombroide) sobrevive la cocción y la congelación. Se previene comprando a proveedores aprobados y controlando la temperatura."],
+    "micro-10":["¿En qué rango crecen más rápido las bacterias?",["70°F a 125°F","0°F a 32°F","135°F a 165°F","165°F a 212°F"],"El crecimiento es más rápido en el centro de la zona de peligro, de 70°F a 125°F."],
+    "micro-11":["Un cliente comió barracuda y dice que lo frío se siente caliente y lo caliente se siente frío. ¿Cuál es la causa probable?",["Ciguatoxina","Histamina","Hepatitis A","Bacillus cereus"],"La ciguatoxina viene de peces de arrecife como la barracuda, el mero y el pargo. La inversión de frío y calor es un signo clásico."],
+    "micro-12":["Bacillus cereus se asocia más comúnmente con:",["Arroz cocido mantenido a temperatura incorrecta","Ostiones crudos","Carnes frías","Carne molida"],"Las esporas de B. cereus sobreviven la cocción. El arroz cocido que se deja en la zona de peligro les permite crecer y producir toxina."],
+    "micro-13":["Los brotes de Clostridium perfringens suelen deberse a:",["Carnes, guisos y salsas enfriados demasiado lento","Lechuga sin lavar","Mariscos crudos","Cantineros que no se lavan las manos"],"Las tandas grandes de platos con carne que se enfrían lentamente son la fuente clásica. Siga la regla de enfriamiento en dos etapas."],
+    "micro-14":["Las bacterias crecen bien en alimentos con una actividad de agua de:",["0.85 o más","0.20 o menos","0.50 o menos","Exactamente 0"],"Los alimentos húmedos (actividad de agua de 0.85 o más) favorecen el crecimiento bacteriano."],
+    "micro-15":["¿Qué patógeno puede crecer a temperatura de refrigerador y se asocia con carnes frías y queso sin pasteurizar?",["Listeria monocytogenes","Norovirus","Hepatitis A","Ciguatoxina"],"La Listeria sigue creciendo en el refrigerador. Vigile las fechas de los alimentos listos para comer."],
+    "micro-16":["El ajo en aceite guardado a temperatura ambiente es un riesgo de:",["Clostridium botulinum","Vibrio vulnificus","Shigella","Norovirus"],"El aceite bloquea el oxígeno, y C. botulinum crece sin oxígeno. Mantenga el ajo en aceite refrigerado o use un producto tratado."]
+  },
+  drills: {
+    "micro:types":{title:"¿Qué contaminante es?", prompt:"¿Es biológico, químico o físico?", bins:["Biológico","Químico","Físico"], items:[
+      ["Virutas de metal de un abrelatas","Los objetos que caen en la comida son contaminantes físicos."],["Norovirus en las manos de un cocinero","Los virus son biológicos."],
+      ["Desengrasante rociado cerca de la barra de ensaladas","Los limpiadores son contaminantes químicos."],["Una curita en la sopa","Las curitas, las joyas y el pelo son físicos."],
+      ["Histamina en atún con abuso de temperatura","Las toxinas de bacterias o pescados son biológicas."],["Desinfectante que quedó en una tabla de cortar","Los residuos de desinfectante son químicos."],
+      ["Una espina en un filete de pescado","Los objetos naturales como las espinas también son contaminantes físicos."],["Salmonella en pollo crudo","Las bacterias son biológicas."]]},
+    "micro:tcs":{title:"¿TCS o no?", prompt:"¿Este alimento necesita control de tiempo y temperatura?", bins:["TCS","No TCS"], items:[
+      ["Melón cantalupo rebanado","El melón cortado es TCS."],["Una manzana entera sin cortar","Los productos enteros sin cortar no son TCS."],["Arroz cocido","Los granos cocidos son TCS."],
+      ["Arroz seco sin cocinar","Los granos secos crudos no son TCS."],["Germinados de frijol","Los germinados son TCS."],["Galletas saladas","Los alimentos secos y estables no son TCS."],
+      ["Tomates cortados","Los tomates cortados son TCS."],["Una papa horneada","Las papas horneadas son TCS (riesgo de botulismo si se dejan fuera)."],
+      ["Una barra de pan","El pan simple no es TCS."],["Tofu","El tofu y la proteína de soya son TCS."]]}
+  }
+},
+zh: {
+  ch: { micro: { name:"微生物大作战", area:"污染与食源性疾病", blurb:"三类污染物、FAT TOM、六大病原体，以及哪些食物需要时间和温度控制。" } },
+  cards: {
+    "Three kinds of contamination":["三类污染","<ul><li><b>生物性：</b>细菌、病毒、寄生虫、真菌及其产生的毒素。</li><li><b>化学性：</b>清洁剂、消毒剂、抛光剂、杀虫剂。</li><li><b>物理性：</b>金属屑、玻璃、骨头、订书钉、首饰、创可贴。</li></ul>"],
+    "FAT TOM":["FAT TOM","<p>细菌生长所需的条件（英文缩写）：</p><ul><li><b>F</b>ood 食物（尤其是蛋白质）</li><li><b>A</b>cidity 酸度：pH 4.6 至 7.5</li><li><b>T</b>emperature 温度：危险温度区 <span class='temp'>41°F–135°F</span></li><li><b>T</b>ime 时间：在危险区 4 小时或以上就要丢弃</li><li><b>O</b>xygen 氧气（有的细菌需要，有的不需要）</li><li><b>M</b>oisture 水分：水活度 0.85 或以上</li></ul><p>时间和温度是你可以直接控制的两项。</p>"],
+    "The Big 6":["六大病原体","<p>传染性极强，少量即可致重病：</p><ul><li>诺如病毒</li><li>甲型肝炎病毒</li><li>志贺氏菌</li><li>伤寒沙门氏菌</li><li>非伤寒沙门氏菌</li><li>产志贺毒素大肠杆菌（STEC）</li></ul>"],
+    "Viruses vs. bacteria":["病毒与细菌","<p>病毒（诺如病毒、甲肝病毒）不会在食物中繁殖，普通烹饪也不能可靠地杀死它们。病毒由人传播，所以<b>洗手和让生病的员工待在家</b>是主要防线。</p><p>细菌会在危险温度区内的食物中繁殖。要控制时间和温度。</p>"],
+    "TCS food":["TCS 食物","<p>需要时间和温度控制的食物：</p><ul><li>牛奶和乳制品；带壳鸡蛋；肉类；禽肉；鱼类；贝类</li><li>烤土豆；煮熟的米饭、豆类和蔬菜</li><li>豆腐和大豆蛋白；豆芽</li><li>切开的甜瓜、切开的番茄、切开的绿叶菜</li><li>未经处理的油浸大蒜</li></ul>"],
+    "High-risk populations":["高风险人群","<ul><li>老年人</li><li>学龄前儿童</li><li>免疫系统较弱的人（癌症治疗、器官移植、艾滋病毒感染者）</li></ul><p>他们病得更重、更快。为他们供餐时，很多规定更严格。</p>"],
+    "Pathogens by food":["常见病原体与食物","<ul><li><b>蜡样芽孢杆菌：</b>保存温度不当的熟米饭</li><li><b>产气荚膜梭菌：</b>冷却过慢的肉类、炖菜和肉汁</li><li><b>肉毒杆菌：</b>油浸大蒜、不当罐装、减氧包装</li><li><b>李斯特菌：</b>熟食肉、未经巴氏消毒的乳制品；在冰箱里也能生长</li><li><b>弧菌：</b>来自温暖海域的生蚝</li></ul>"],
+    "Seafood toxins":["海产毒素","<p>烹饪和冷冻<b>都不能</b>破坏这些毒素。要从合格供应商采购。</p><ul><li><b>组胺（鲭鱼毒素）：</b>时间温度控制不当的金枪鱼、鲭鱼、鲯鳅鱼。症状：脸红、出汗、口腔灼热。</li><li><b>雪卡毒素：</b>礁鱼，如梭鱼、石斑鱼、鲷鱼、琥珀鱼。症状：冷热感觉颠倒。</li></ul>"]
+  },
+  qs: {
+    "micro-0":["危险温度区是多少？",["41°F 至 135°F","0°F 至 32°F","135°F 至 165°F","32°F 至 70°F"],"细菌在 41°F 到 135°F 之间繁殖很快。冷食要保持冷，热食要保持热。"],
+    "micro-1":["细菌最容易在哪种食物中生长？",["中性或微酸性的食物","高酸性的食物，如柠檬汁","非常干燥的食物，如饼干","冷冻结实的食物"],"大多数病原体在 pH 4.6 到 7.5 之间生长最好。"],
+    "micro-2":["以下哪项是物理性污染物？",["开罐器产生的金属屑","备餐台上的消毒剂","诺如病毒","金枪鱼中的组胺"],"物理性污染物是实物：金属、玻璃、骨头、首饰、创可贴。"],
+    "micro-3":["以下哪种病原体属于六大病原体？",["甲型肝炎病毒","蜡样芽孢杆菌","产气荚膜梭菌","单核细胞增生李斯特菌"],"六大病原体是诺如病毒、甲肝病毒、志贺氏菌、伤寒沙门氏菌、非伤寒沙门氏菌和产志贺毒素大肠杆菌。"],
+    "micro-4":["哪种食物需要时间和温度控制（TCS）？",["切开的甜瓜","完整未切的苹果","未煮的干大米","一条面包"],"切开甜瓜会露出湿润的果肉，细菌能在上面繁殖。切开的甜瓜、番茄和绿叶菜都是 TCS 食物。"],
+    "micro-5":["防止诺如病毒在厨房传播的最好方法是什么？",["正确洗手，并让生病员工远离工作","所有食物煮到 135°F","把食物放进冷冻柜","把食物盖好"],"诺如病毒来自人，烹饪不能可靠地杀死它。洗手和不让生病员工上班是关键。"],
+    "micro-6":["厨师在敞开的沙拉吧旁喷玻璃清洁剂。这属于哪种污染？",["化学性","物理性","生物性","交叉接触"],"清洁剂、消毒剂和抛光剂都是化学性污染物，要远离食物使用。"],
+    "micro-7":["哪一类人属于高风险人群？",["学龄前儿童","青少年","18 至 40 岁的健康成年人","大学运动员"],"学龄前儿童、老年人和免疫力弱的人风险更高。"],
+    "micro-8":["在 FAT TOM 六个条件中，食品从业人员最能直接控制的是哪两个？",["时间和温度","氧气和水分","食物和酸度","酸度和氧气"],"限制食物在危险区的时间，并保持安全温度。"],
+    "micro-9":["放置太久的金枪鱼让客人脸红出汗。烹饪能否避免这种情况？",["不能。组胺不会被烹饪或冷冻破坏","能，煮到 145°F 即可","能，煮到 165°F 即可","能，只要先冷冻"],"组胺（鲭鱼毒素）在烹饪和冷冻后依然存在。预防方法是从合格供应商采购并控制温度。"],
+    "micro-10":["细菌在哪个温度范围繁殖最快？",["70°F 至 125°F","0°F 至 32°F","135°F 至 165°F","165°F 至 212°F"],"细菌在危险区中段 70°F 到 125°F 繁殖最快。"],
+    "micro-11":["客人吃了梭鱼后说冷的东西感觉热、热的东西感觉冷。最可能的原因是？",["雪卡毒素","组胺","甲型肝炎病毒","蜡样芽孢杆菌"],"雪卡毒素来自梭鱼、石斑鱼、鲷鱼等礁鱼。冷热感觉颠倒是典型症状。"],
+    "micro-12":["蜡样芽孢杆菌最常与哪种食物有关？",["保存温度不当的熟米饭","生蚝","熟食肉","牛肉末"],"蜡样芽孢杆菌的芽孢能在烹饪后存活。熟米饭放在危险区内，就会让它繁殖并产生毒素。"],
+    "micro-13":["产气荚膜梭菌的暴发通常由什么引起？",["冷却过慢的肉类、炖菜和肉汁","未洗的生菜","生贝类","调酒师不洗手"],"大批量肉类菜肴冷却太慢是典型来源。要遵守两阶段冷却规定。"],
+    "micro-14":["细菌在水活度为多少的食物中容易生长？",["0.85 或以上","0.20 或以下","0.50 或以下","正好为 0"],"湿润的食物（水活度 0.85 以上）利于细菌生长。"],
+    "micro-15":["哪种病原体在冰箱温度下也能生长，并与熟食肉和未经巴氏消毒的奶酪有关？",["单核细胞增生李斯特菌","诺如病毒","甲型肝炎病毒","雪卡毒素"],"李斯特菌在冰箱里也会继续生长。要注意即食食品的日期标签。"],
+    "micro-16":["室温存放的油浸大蒜有哪种风险？",["肉毒杆菌","创伤弧菌","志贺氏菌","诺如病毒"],"油会隔绝氧气，而肉毒杆菌在无氧环境中生长。油浸大蒜要冷藏或使用经过处理的产品。"]
+  },
+  drills: {
+    "micro:types":{title:"辨认污染物", prompt:"这是生物性、化学性还是物理性？", bins:["生物性","化学性","物理性"], items:[
+      ["开罐器产生的金属屑","掉进食物的物体属于物理性污染物。"],["厨师手上的诺如病毒","病毒属于生物性。"],["在沙拉吧附近喷洒的去油剂","清洁剂属于化学性污染物。"],
+      ["汤里的创可贴","创可贴、首饰、头发都属于物理性。"],["温度控制不当的金枪鱼中的组胺","细菌或鱼类产生的毒素属于生物性。"],["砧板上残留的消毒剂","消毒剂残留属于化学性。"],
+      ["鱼片中的鱼刺","鱼刺等天然物体也属于物理性污染物。"],["生鸡肉中的沙门氏菌","细菌属于生物性。"]]},
+    "micro:tcs":{title:"是不是 TCS 食物？", prompt:"这种食物需要时间和温度控制吗？", bins:["TCS","非 TCS"], items:[
+      ["切开的哈密瓜","切开的甜瓜属于 TCS。"],["完整未切的苹果","完整未切的蔬果不属于 TCS。"],["熟米饭","煮熟的谷物属于 TCS。"],["未煮的干大米","生的干谷物不属于 TCS。"],
+      ["豆芽","豆芽属于 TCS。"],["苏打饼干","干燥、常温稳定的食物不属于 TCS。"],["切开的番茄","切开的番茄属于 TCS。"],["烤土豆","烤土豆属于 TCS（放在室温有肉毒杆菌风险）。"],
+      ["一条面包","普通面包不属于 TCS。"],["豆腐","豆腐和大豆蛋白属于 TCS。"]]}
+  }
+}};
+
+/* ---------- Language and read-aloud helpers ---------- */
+function loc(s, ...a){ let x = (S.lang!=="en" && UI[S.lang] && UI[S.lang][s]) || s; a.forEach((v,i) => { x = x.split("{"+i+"}").join(v); }); return x; }
+const L = () => (S.lang!=="en" && TX[S.lang]) || null;
+const chText = (c, k) => (L() && L().ch[c.id] && L().ch[c.id][k]) || c[k];
+const locQ = (id, raw) => { const t = L() && L().qs[id]; return t ? [t[0], t[1], t[2], raw[3]] : raw; };
+function locCard(cd){
+  const l = L(); if (!l) return cd;
+  if (Array.isArray(cd)){ const t = l.cards[cd[0]]; return t ? [t[0], t[1], cd[2]] : cd; }
+  const t = l.drills[cd.id]; if (!t) return cd;
+  const out = {...cd, ...t};
+  if (cd.items && t.items) out.items = cd.items.map((it,k) => Array.isArray(it) ? [t.items[k][0], it[1], t.items[k][1]] : t.items[k]);
+  return out;
+}
+function applyStatic(){
+  document.querySelectorAll("[data-i18n]").forEach(el => { if (el.dataset.en==null) el.dataset.en = el.textContent; el.textContent = loc(el.dataset.en); });
+  document.documentElement.lang = S.lang==="zh" ? "zh-Hans" : S.lang;
+  $("#lang").value = S.lang;
+  const n = $("#langnote"); n.hidden = S.lang==="en"; n.textContent = loc("LANGNOTE");
+}
+$("#lang").addEventListener("change", e => { S.lang = e.target.value; save(); renderHome(); });
+const canSpeak = "speechSynthesis" in window;
+const SPK = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9v6h4l5 4V5L7 9H3zm13.5 3a4.5 4.5 0 0 0-2.5-4v8a4.5 4.5 0 0 0 2.5-4zM14 3.2v2.1a7 7 0 0 1 0 13.4v2.1a9 9 0 0 0 0-17.6z"/></svg>';
+const speakBtn = sel => canSpeak ? `<button class="speak" data-act="speak" data-say="${sel}">${SPK}<span>${loc("Read aloud")}</span></button>` : "";
+function speakSel(sel){
+  const el = $(sel); if (!el || !canSpeak) return;
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(el.innerText);
+  u.lang = {en:"en-US", es:"es-US", zh:"zh-CN"}[S.lang];
+  const v = speechSynthesis.getVoices().find(v => v.lang.replace("_","-").toLowerCase().startsWith(u.lang.slice(0,2)));
+  if (v) u.voice = v;
+  u.rate = 0.95; speechSynthesis.speak(u);
+}
+
+/* ---------- Screens (language-aware) ---------- */
+const head = (title, extra="", back) => `<div class="play-head">${back?`<button class="link" data-act="home">${loc("← Back")}</button>`:`<button class="link" data-act="quit">${loc("← Leave")}</button>`}<span class="ttl">${esc(title)}</span>${extra}</div>`;
+
+function renderStations(){
+  const t=S.track, tk=TRACKS[t], chs=chaptersFor(t);
+  const passed = chs.filter(c => (S.prog[t][c.id]||{}).passed).length;
+  let h = `<div class="section-h" style="margin-top:0"><h2>${esc(loc(tk.name))}</h2><span class="note">${loc("{0} of {1} stations passed · checks need {2}% to pass", passed, chs.length, tk.pass)}</span></div><div class="grid">`;
+  chs.forEach((c, i) => {
+    const rec = S.prog[t][c.id] || {}, open = unlocked(t, i), qn = Math.min(tk.qPer, poolFor(c,t).length);
+    const dr = c.cards.filter(x => isDrill(x) && (!isM(x) || t==="mgr")), ndone = dr.filter(x => S.drills[x.id]).length;
+    const pill = rec.passed ? `<span class="pill ok">${loc("Passed")}</span>` : open ? `<span class="pill ready">${loc("Ready")}</span>` : `<span class="pill lock">${loc("Locked")}</span>`;
+    h += `<article class="ticket ${open?"":"locked"}">
+      <div class="thead"><span class="eyebrow">${loc("Station {0}", String(i+1).padStart(2,"0"))}</span>${pill}</div>
+      <h3>${esc(chText(c,"name"))}</h3><div class="area">${esc(chText(c,"area"))}</div>
+      <p>${esc(chText(c,"blurb"))}</p>
+      <div class="tfoot">
+        <button class="btn ghost" data-act="study" data-ch="${c.id}">${loc("Study")}${dr.length?" · "+loc("{0}/{1} drills", ndone, dr.length):""}</button>
+        <button class="btn ${open?"go":""}" data-act="check" data-ch="${c.id}" ${open?"":"disabled"}>${loc(rec.passed?"Retake check · {0}Q":"Take check · {0}Q", qn)}</button>
+        ${starsHtml(rec.stars||0)}${rec.best!=null?`<span class="best">${loc("best {0}%", rec.best)}</span>`:""}
+      </div>
+      ${open?"":`<div class="note">${loc("Pass station {0} to unlock the check. You can still study.", String(i).padStart(2,"0"))}</div>`}
+    </article>`;
+  });
+  const fin = S.prog[t].final || {}, fopen = allPassed(t);
+  const fq = Math.min(tk.finalN, chs.reduce((n,c)=>n+poolFor(c,t).length,0));
+  h += `<article class="ticket boss ${fopen?"":"locked"}">
+    <div class="thead"><span class="eyebrow">${loc("Final")}</span>${fin.passed?`<span class="pill ok">${loc("Passed")}</span>`:fopen?`<span class="pill hot">${loc("Boss")}</span>`:`<span class="pill lock">${loc("Locked")}</span>`}</div>
+    <h3>${loc("Health Inspection")}</h3><div class="area">${loc("Practice exam · every station")}</div>
+    <p>${loc("{0} questions drawn from every station.", fq)} ${tk.timer?loc("{0}-minute clock.", tk.timer/60):""} ${loc("Score 75% to pass, the same bar as the real exam.")}</p>
+    <div class="tfoot"><button class="btn ${fopen?"go":""}" data-act="final" ${fopen?"":"disabled"}>${loc(fin.passed?"Retake inspection":"Start inspection")}</button>${fin.best!=null?`<span class="best">${loc("best {0}%", fin.best)}</span>`:""}</div>
+    ${fopen?"":`<div class="note">${loc("Unlocks when all {0} stations are passed.", chs.length)}</div>`}
+  </article></div>`;
+  $("#pane-stations").innerHTML = h;
+}
+
+function startStudy(c, i){
+  const cards = c.cards.filter(x => !isM(x) || S.track==="mgr");
+  i = Math.max(0, Math.min(i, cards.length-1));
+  const cd = locCard(cards[i]), open = unlocked(S.track, chaptersFor(S.track).indexOf(c)), arr = Array.isArray(cd), drill = isDrill(cd);
+  const tags = (isM(cd)?`<span class="pill hot mgrtag">${loc("Manager")}</span>`:"") +
+    (drill ? (S.drills[cd.id]?`<span class="pill ok mgrtag">${loc("Drill done")}</span>`:`<span class="pill ready mgrtag">${loc("Drill · +10 XP")}</span>`) : arr ? "" : `<span class="pill lock mgrtag">${loc("Picture")}</span>`);
+  const body = arr ? cd[1] : cd.type==="pic" ? cd.pic()+(cd.body||"") : `<p class="drillprompt">${esc(cd.prompt)}</p><div id="drill"></div>`;
+  $("#play").innerHTML = `<div class="play-head"><button class="link" data-act="home">${loc("← Stations")}</button><span class="ttl">${esc(chText(c,"name"))} · ${loc("card {0} of {1}", i+1, cards.length)}</span>${speakBtn("#card")}</div>
+    <div class="card" id="card">${tags?`<div class="tags">${tags}</div>`:""}<h2>${esc(arr?cd[0]:cd.title)}</h2>${body}</div>
+    <div class="dots">${cards.map((_,k)=>`<i class="${k===i?"on":""}"></i>`).join("")}</div>
+    <div class="navrow">
+      <button class="btn ghost" id="sprev" ${i===0?"disabled":""}>${loc("Previous")}</button>
+      ${i<cards.length-1 ? `<button class="btn" id="snext">${loc("Next card")}</button>` : open ? `<button class="btn go" id="sgo">${loc("Take the check")}</button>` : `<button class="btn" data-act="home">${loc("Back to stations")}</button>`}
+    </div>`;
+  showPlay(true);
+  $("#sprev").onclick = () => startStudy(c, i-1);
+  const n=$("#snext"); if(n) n.onclick = () => startStudy(c, i+1);
+  const g=$("#sgo"); if(g) g.onclick = () => startStation(c);
+  if (drill) runDrill(cd, $("#drill"));
+}
+
+function makeItem(id, raw){
+  const loc1 = locQ(id, raw), order = shuffle([0,1,2,3]), tr1 = loc1!==raw;
+  return {id, q:loc1[0], opts:order.map(k=>loc1[1][k]), ans:order.indexOf(0), exp:loc1[2], enQ: tr1 ? raw[0] : null, enOpts: tr1 ? order.map(k=>raw[1][k]) : null};
+}
+function renderQ(){
+  const it = Q.items[Q.i], n = Q.items.length;
+  $("#play").innerHTML = head(Q.title, Q.end?`<span class="timer" id="qtimer">--:--</span>`:"") +
+    `<div class="bar"><span style="width:${Q.i/n*100}%"></span></div>
+    <div class="qmeta"><span class="eyebrow">${loc("Question {0} of {1}", Q.i+1, n)}</span><span class="combo" ${Q.combo<2?"hidden":""}>${loc("Combo ×{0}", Q.combo)}</span>${speakBtn("#qread")}</div>
+    <div id="qread"><h2 class="qtext">${esc(it.q)}${it.enQ?`<span class="en" hidden>${esc(it.enQ)}</span>`:""}</h2>
+    <div class="opts">${it.opts.map((o,k)=>`<button class="opt" data-k="${k}"><span class="key">${"ABCD"[k]}</span><span>${esc(o)}${it.enOpts?`<span class="en" hidden>${esc(it.enOpts[k])}</span>`:""}</span></button>`).join("")}</div></div>
+    ${it.enQ?`<button class="link" id="entog">${loc("Show English")}</button>`:""}
+    <div id="fb"></div>`;
+  if (Q.end) tick();
+  document.querySelectorAll(".opt").forEach(b => b.onclick = () => pick(+b.dataset.k));
+  const eg = $("#entog");
+  if (eg) eg.onclick = () => { const show = $("#qread .en").hidden; document.querySelectorAll("#qread .en").forEach(e => e.hidden = !show); eg.textContent = loc(show?"Hide English":"Show English"); };
+}
+function pick(k){
+  const it = Q.items[Q.i]; if (Q.picks[Q.i]!=null) return;
+  Q.picks[Q.i] = k; const ok = k===it.ans;
+  if (ok){ Q.combo++; Q.maxCombo=Math.max(Q.maxCombo,Q.combo); if (S.missed[it.id]){ delete S.missed[it.id]; S.cleared++; if(Q.kind==="review" && S.cleared>=5) award("review"); } }
+  else { Q.combo=0; if (QINDEX[it.id]) S.missed[it.id]=(S.missed[it.id]||0)+1; try { if (navigator.vibrate) navigator.vibrate(120); } catch(e) {} }
+  document.querySelectorAll(".opt").forEach((b,j) => { b.disabled=true; if(j===it.ans) b.classList.add("right"); else if(j===k) b.classList.add("wrong"); });
+  const c = $(".combo"); if (c){ c.hidden = Q.combo<2; c.textContent = loc("Combo ×{0}", Q.combo); }
+  const last = Q.i===Q.items.length-1;
+  $("#fb").innerHTML = `<div class="feedback"><div class="verdict ${ok?"ok":"no"}">${loc(ok?"Correct":"Not quite")}</div>${ok?"":`<p><b>${loc("Answer:")}</b> ${esc(it.opts[it.ans])}</p>`}<p>${esc(it.exp)}</p><div class="row"><button class="btn" id="qnext">${loc(last?"See results":"Next question")}</button></div></div>`;
+  const nb=$("#qnext"); nb.focus(); nb.onclick = () => { if(last) finishQuiz(); else { Q.i++; renderQ(); } };
+}
+function finishQuiz(){
+  stopTimers();
+  const n=Q.items.length, correct=Q.items.filter((it,i)=>Q.picks[i]===it.ans).length, pct=Math.round(correct/n*100), passed=pct>=Q.pass;
+  touchStreak();
+  const extra = Q.onDone({correct, n, pct, passed, maxCombo:Q.maxCombo}) || {};
+  save();
+  const missed = Q.items.map((it,i)=>({it, p:Q.picks[i]})).filter(x => x.p!==x.it.ans);
+  $("#play").innerHTML = head(Q.title, "", true) + `
+    <div class="result">
+      <div class="eyebrow">${loc("{0} of {1} correct · pass mark {2}%", correct, n, Q.pass)}</div>
+      <div class="stamp ${passed?"ok":"no"}">${loc(passed?(Q.passWord||"Passed"):"Not yet")}</div>
+      <div class="bigscore">${pct}%</div>
+      ${extra.stars!=null?`<div style="margin-top:10px">${starsHtml(extra.stars)}</div>`:""}
+      <div class="rstats"><div><b>+${extra.xp||0}</b>${loc("XP earned")}</div><div><b>×${Q.maxCombo}</b>${loc("best combo")}</div>${extra.stat||""}</div>
+      <div class="btnrow">${extra.buttons||""}<button class="btn ghost" data-act="home">${loc("Back to stations")}</button></div>
+    </div>
+    ${missed.length?`<div class="misslist"><h3 style="font-size:24px">${loc("Review what you missed")}</h3>${missed.map(x=>`<div class="miss"><div class="q">${esc(x.it.q)}</div>${x.p!=null?`<div class="yours">${loc("You said:")} ${esc(x.it.opts[x.p])}</div>`:`<div class="yours">${loc("Not answered")}</div>`}<div class="ans">${loc("Answer:")} ${esc(x.it.opts[x.it.ans])}</div><p>${esc(x.it.exp)}</p></div>`).join("")}</div>`:""}`;
+  const r=$("#again"); if(r) r.onclick = extra.again;
+  const nx=$("#nextst"); if(nx) nx.onclick = extra.next;
+  Q = {...Q, items:[]};
+}
+function startStation(c){
+  const t=S.track, tk=TRACKS[t], pool=poolFor(c,t), chs=chaptersFor(t), idx=chs.indexOf(c);
+  if (!unlocked(t, idx)) return;
+  const items = shuffle(pool).slice(0, Math.min(tk.qPer, pool.length)).map(x => makeItem(x.id, x.q));
+  startQuiz({kind:"station", title:`${chText(c,"name")} · ${loc(tk.name)}`, items, pass:tk.pass, onDone: r => {
+    const rec = S.prog[t][c.id] || {best:0, stars:0, passed:false};
+    const stars = r.passed ? (r.pct===100?3:r.pct>=90?2:1) : 0;
+    const firstPass = r.passed && !rec.passed;
+    S.prog[t][c.id] = {best:Math.max(rec.best||0, r.pct), stars:Math.max(rec.stars||0, stars), passed:rec.passed||r.passed};
+    const xp = r.correct*tk.xp + r.maxCombo*2 + (r.passed?50:0) + (r.pct===100?50:0);
+    addXP(xp);
+    if (r.passed) award("first");
+    if (r.pct===100) award("perfect");
+    if (allPassed(t)) award("line_"+t);
+    const nextC = chs[idx+1];
+    if (firstPass) toast(nextC ? loc("{0} unlocked", chText(nextC,"name")) : loc("Health Inspection unlocked"), loc("Station cleared"));
+    return {xp, stars, again:()=>startStation(c), next: nextC ? ()=>startStudy(nextC,0) : startFinal,
+      buttons:`<button class="btn ghost" id="again">${loc("Retake check")}</button>${r.passed?`<button class="btn go" id="nextst">${nextC?loc("Next station: {0}", esc(chText(nextC,"name"))):loc("Go to final inspection")}</button>`:""}`};
+  }});
+}
+function startFinal(){
+  const t=S.track, tk=TRACKS[t]; if(!allPassed(t)) return;
+  const pool = chaptersFor(t).flatMap(c => poolFor(c,t));
+  const items = shuffle(pool).slice(0, Math.min(tk.finalN, pool.length)).map(x => makeItem(x.id, x.q));
+  startQuiz({kind:"final", title:`${loc("Health Inspection")} · ${loc(tk.name)}`, items, pass:75, timer:tk.timer, passWord:"Inspection passed", onDone: r => {
+    const rec = S.prog[t].final || {};
+    S.prog[t].final = {best:Math.max(rec.best||0, r.pct), passed:rec.passed||r.passed};
+    const xp = r.correct*tk.xp + (r.passed?200:0); addXP(xp);
+    if (r.passed) award("final_"+t);
+    return {xp, again:startFinal, buttons:`<button class="btn ghost" id="again">${loc("Take another practice exam")}</button>`};
+  }});
+}
+
+function drillOrder(d, host){
+  const deck = shuffle(d.items.map((t,k) => ({t,k}))); const placed = [];
+  const paint = checked => {
+    const ok = checked && placed.every((p,s) => p.k===s);
+    host.innerHTML = `<ol class="slots">${d.items.map((_,s) => { const p=placed[s], cls=checked?(p.k===s?"right":"wrong"):"";
+        return `<li class="slot ${cls}"><span class="n">${s+1}</span><span>${p?esc(p.t):`<span class="note">${s===placed.length?loc("Tap the next step"):"&nbsp;"}</span>`}${checked&&p.k!==s?`<small>${loc("Should be:")} ${esc(d.items[s])}</small>`:""}</span></li>`; }).join("")}</ol>
+      ${checked?"":`<div class="pool">${deck.map((it,j) => `<button class="item" data-j="${j}" ${placed.includes(it)?"disabled":""}>${esc(it.t)}</button>`).join("")}</div>`}
+      <div class="drillbar">${checked ? `<span class="msg ${ok?"ok":"no"}">${loc(ok?"All in order":"Some steps are out of order")}</span><button class="btn ghost" data-dr="retry">${loc(ok?"Play again":"Try again")}</button>`
+        : `<button class="btn ghost" data-dr="undo" ${placed.length?"":"disabled"}>${loc("Undo")}</button>`}</div>`;
+    host.querySelectorAll(".item").forEach(b => b.onclick = () => {
+      placed.push(deck[+b.dataset.j]);
+      if (placed.length===d.items.length){ paint(true); if (placed.every((p,s) => p.k===s)) drillDone(d, true); } else paint(false);
+    });
+    const u = host.querySelector('[data-dr="undo"]'); if (u) u.onclick = () => { placed.pop(); paint(false); };
+    const r = host.querySelector('[data-dr="retry"]'); if (r) r.onclick = () => drillOrder(d, host);
+  };
+  paint(false);
+}
+function drillMatch(d, host){
+  const rights = shuffle(d.pairs.map((p,k) => ({t:p[1], k}))); const done = new Set(), used = new Set(); let sel = null, miss = 0;
+  const paint = () => {
+    const fin = done.size===d.pairs.length;
+    host.innerHTML = `<div class="match"><div class="col">${d.pairs.map((p,k) => `<button class="mbtn ${done.has(k)?"done":sel===k?"sel":""}" data-l="${k}" ${done.has(k)?"disabled":""}>${esc(p[0])}</button>`).join("")}</div>
+      <div class="col">${rights.map((r,j) => `<button class="mbtn ${used.has(j)?"done":""}" data-r="${j}" ${used.has(j)?"disabled":""}>${esc(r.t)}</button>`).join("")}</div></div>
+      <div class="drillbar">${fin ? `<span class="msg ${miss?"no":"ok"}">${miss?loc("All matched, with {0} wrong taps", miss):loc("Perfect match")}</span><button class="btn ghost" data-dr="retry">${loc("Shuffle and replay")}</button>`
+        : `<span class="note">${loc(sel==null?"Tap an item on the left, then its match on the right.":"Now tap its match on the right.")}</span>`}</div>`;
+    host.querySelectorAll("[data-l]").forEach(b => b.onclick = () => { sel = +b.dataset.l; paint(); });
+    host.querySelectorAll("[data-r]").forEach(b => b.onclick = () => {
+      if (sel==null) return; const j = +b.dataset.r;
+      if (rights[j].t===d.pairs[sel][1]){ done.add(sel); used.add(j); sel=null; paint(); if (done.size===d.pairs.length) drillDone(d, miss===0); }
+      else { miss++; b.classList.add("bad"); setTimeout(() => b.classList.remove("bad"), 500); }
+    });
+    const r = host.querySelector('[data-dr="retry"]'); if (r) r.onclick = () => drillMatch(d, host);
+  };
+  paint();
+}
+function drillSort(d, host){
+  const items = shuffle(d.items); let i = 0, score = 0;
+  const paint = () => {
+    if (i>=items.length){
+      const ok = score/items.length >= 0.75;
+      host.innerHTML = `<div class="drillbar"><span class="msg ${ok?"ok":"no"}">${loc("{0} of {1} sorted correctly", score, items.length)}${ok?"":" · "+loc("Get 75% to complete the drill.")}</span><button class="btn ghost" data-dr="retry">${loc("Play again")}</button></div>`;
+      host.querySelector('[data-dr="retry"]').onclick = () => drillSort(d, host);
+      if (ok) drillDone(d, score===items.length);
+      return;
+    }
+    const [txt, bin, why] = items[i];
+    host.innerHTML = `<div class="qmeta"><span class="eyebrow">${loc("{0} of {1}", i+1, items.length)}</span><span class="rushscore">${loc("{0} correct", score)}</span></div>
+      <div class="sortitem">${esc(txt)}</div>
+      <div class="bins">${d.bins.map((b,k) => `<button class="btn ghost bin" data-b="${k}">${esc(b)}</button>`).join("")}</div><div class="sfb"></div>`;
+    host.querySelectorAll(".bin").forEach(b => b.onclick = () => {
+      const k = +b.dataset.b, ok = k===bin; if (ok) score++; else { try { if (navigator.vibrate) navigator.vibrate(120); } catch(e) {} }
+      host.querySelectorAll(".bin").forEach((x,j) => { x.disabled = true; if (j===bin) x.classList.add("right"); else if (j===k) x.classList.add("wrong"); });
+      host.querySelector(".sfb").innerHTML = `<div class="feedback" style="margin-top:12px"><div class="verdict ${ok?"ok":"no"}">${ok?loc("Correct"):loc("It's {0}", esc(d.bins[bin]))}</div><p>${esc(why)}</p><div class="row"><button class="btn" data-dr="next">${loc(i===items.length-1?"Finish":"Next")}</button></div></div>`;
+      host.querySelector('[data-dr="next"]').onclick = () => { i++; paint(); };
+    });
+  };
+  paint();
 }
 
 renderHome();
